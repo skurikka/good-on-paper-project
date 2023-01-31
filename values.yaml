@@ -1,0 +1,92 @@
+## The GitLab Server URL (with protocol) that want to register the runner against
+## ref: https://docs.gitlab.com/runner/commands/index.html#gitlab-runner-register
+##
+gitlabUrl: "https://gitlab.jyu.fi"
+
+## The Registration Token for adding new Runners to the GitLab Server. This must
+## be retrieved from your GitLab Instance.
+## ref: https://docs.gitlab.com/ce/ci/runners/index.html
+## NOTE: In TJTS5901 we set this using kubernetes secrets.
+##
+# runnerRegistrationToken: gitlab-runner-secret
+
+## Unregister all runners before termination
+##
+## Updating the runner's chart version or configuration will cause the runner container
+## to be terminated and created again. This may cause your Gitlab instance to reference
+## non-existant runners. Un-registering the runner before termination mitigates this issue.
+## ref: https://docs.gitlab.com/runner/commands/index.html#gitlab-runner-unregister
+##
+unregisterRunners: true
+
+## Configure the maximum number of concurrent jobs
+## - Documentation: https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-global-section
+## - Default value: 10
+concurrent: 2
+
+## For RBAC support:
+rbac:
+  create: true
+  clusterWideAccess: false
+  # rules:
+  # - apiGroups: [""]
+  #   resources: ["pods"]
+  #   verbs: ["get", "create", "delete"]
+  # - apiGroups: [""]
+  #   resources: ["pods/exec"]
+  #   verbs: ["get", "create"]
+  # - apiGroups: [""]
+  #   resources: ["pods/attach"]
+  #   verbs: ["create"]
+  # - apiGroups: [""]
+  #   resources: ["secrets", "configmaps"]
+  #   verbs: ["create", "update", "delete"]
+  # - apiGroups: [""]
+  #   resources: ["services"]
+  #   verbs: ["create"]
+
+
+## Configuration for the Pods that the runner launches for each new job
+##
+runners:
+
+  image: ubuntu:20.04
+  builds: {}
+  services: {}
+  helpers: {}
+
+  name: "Kubernetes runner on Azure for TJTS5901"
+
+  ## Tags associated with the runner. Comma-separated list of tags.
+  ## - Documentation: https://docs.gitlab.com/ce/ci/runners/#using-tags
+  tags: kubernetes, cluster
+
+  ## Determine whether the runner should also run jobs without tags.
+  ## - Documentation: https://docs.gitlab.com/ee/ci/runners/configure_runners.html#set-a-runner-to-run-untagged-jobs
+  runUntagged: true
+
+  # runner configuration, where the multi line strings is evaluated as
+  # template so you can specify helm values inside of it.
+  #
+  # tpl: https://helm.sh/docs/howto/charts_tips_and_tricks/#using-the-tpl-function
+  # runner configuration: https://docs.gitlab.com/runner/configuration/advanced-configuration.html
+  config: |
+    [[runners]]
+      environment = ["DOCKER_DRIVER=overlay2"]
+      [runners.kubernetes]
+        namespace = "{{.Release.Namespace}}"
+        privileged = true
+
+      [[runners.kubernetes.volumes.empty_dir]]
+        name = "docker-certs"
+        mount_path = "/certs/client"
+        medium = "Memory"
+
+  ## The name of the secret containing runner-token and runner-registration-token
+  secret: runner-registration-token
+  
+  ## Run all containers with the privileged flag enabled
+  ## This will allow the docker:dind image to run if you need to run Docker
+  ## commands. Please read the docs before turning this on:
+  ## - Documentation: https://docs.gitlab.com/runner/executors/kubernetes.html#using-docker-dind
+  privileged: true
