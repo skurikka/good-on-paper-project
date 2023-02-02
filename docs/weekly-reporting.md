@@ -61,7 +61,14 @@ Made development branch.
 
 ### Week 1
 
+Set some ground rules for the team and did some basic recon on what kind of roles we should expect
+
+Made stakeholder cards as a group
+
+setup the dev environment and made sure everything works
 ### Week 2
+
+Added basic functionality for mongodb
 
 ### Week 3
 
