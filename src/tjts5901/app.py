@@ -19,6 +19,7 @@ from flask import (
 )
 
 from .utils import get_version
+from .db import init_db
 
 
 def create_app(config: Optional[Dict] = None) -> Flask:
@@ -35,6 +36,9 @@ def create_app(config: Optional[Dict] = None) -> Flask:
     # Set flask config variable for "rich" loggin from environment variable.
     flask_app.config.from_envvar("RICH_LOGGING", silent=True)
 
+    # Init db connection
+    init_db(flask_app)
+    
     # Register blueprints
     from . import views  # pylint: disable=import-outside-toplevel
     flask_app.register_blueprint(views.bp, url_prefix='')

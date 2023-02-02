@@ -14,9 +14,4 @@
 # developers or deployments, as you can simply share the .env file rather than hardcoding the
 # values into the application itself.
 
-FLASK_APP=tjts5901.app
-FLASK_DEBUG=1
-
-# Enable rich logging for more human readable log output. Requires installing
-# `rich` and `flask-rich` packages.
-#RICH_LOGGING=1
+MONGO_URL="mongodb://localhost:27017/tjts5901"
