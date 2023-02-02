@@ -1,8 +1,10 @@
-# Weekly assingment - Week 1
+# Weekly assingment
 
-Tasks done in the first week.
+Tasks done in the first during the course.
 
 ## Samuli
+
+### Week 1
 
 As a team we did the first assingment filling the user-stories and stakeholder
 analysysis and did the OWASP considerations.
@@ -10,12 +12,65 @@ analysysis and did the OWASP considerations.
 I forked and created teams project from the courses repo and made
 this `md` template for the answers. I also set up the local development environment.
 
+### Week 2
+
+Changed reporting template.
+
+Configured mongoDB to work in my local container.
+
+Made and assinged issues from user cases.
+
+Made development branch.
+
+### Week 1
+
+### Week 2
+
+### Week 3
+
+### Week 4
+
+### Week 5
+
+
 ## Ville
+
+### Week 1
+
+### Week 2
+
+### Week 3
+
+### Week 4
+
+### Week 5
 
 ## Linda
 
+### Week 1
+
+### Week 2
+
+### Week 3
+
+### Week 4
+
+### Week 5
+
 ## Ari
 
+### Week 1
+
+### Week 2
+
+### Week 3
+
+### Week 4
+
+### Week 5
+
+
+-------------------------------
 ## OWASP considerations
 
 As a team, we have decided that the OWASP security consideration examples that
