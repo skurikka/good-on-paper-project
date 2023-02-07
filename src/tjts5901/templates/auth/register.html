@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Register{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div id="register">
+  <form method="post" action="{{ url_for('auth.register')}}">
+    <label for="email">Email</label>
+    <input name="email" id="email" required>
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" required>
+    <label for="password">Confirm password</label>
+    <input type="password" name="conf-password" id="conf-password" required>
+
+      
+    <label for="terms" class="terms"><input type="checkbox" id="terms" name="terms">I agree to the <a href="#">terms and conditions</a></label>
+
+    <input type="submit" value="Register" class="btn">
+  </form>
+</div>
+{% endblock %}

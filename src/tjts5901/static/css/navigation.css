@@ -1,0 +1,44 @@
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    font-size: 16px;
+}
+
+#main-navigation ul {
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+    gap: 1.5em;
+    align-items: center;
+}
+
+#main-navigation a {
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+#main-navigation a:hover {
+    text-transform: uppercase;
+    text-decoration-line: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+}
+
+.header-section {
+    background-color: white;
+    filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
+    position: fixed;
+    width: 100%;
+    top: 0;
+}
+
+footer {
+    background-color: #16271F;
+    color: white;
+    margin-top: 2em;
+    padding-top: 2em;
+    padding-bottom: 2em;
+}

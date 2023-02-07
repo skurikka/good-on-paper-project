@@ -4,10 +4,18 @@ from mongoengine import (
     IntField,
     ReferenceField,
     DateTimeField,
+    EmailField
 )
 from .db import db    
 class User(db.Document):
-    ...    
+    """
+    Users on the auction site
+    """ 
+
+    email = EmailField(require=True, unique=True)
+    password = StringField(required=True)
+    created_at = DateTimeField(required=True, default=datetime.utcnow)
+
 class Item(db.Document):
     """
     Items on the auction site

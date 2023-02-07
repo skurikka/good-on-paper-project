@@ -30,15 +30,27 @@ def create_app(config: Optional[Dict] = None) -> Flask:
     """
     flask_app = Flask(__name__, instance_relative_config=True)
 
-    if config:
+    flask_app.config.from_mapping(
+        SECRET_KEY='dev',
+        BRAND="Hill Valley DMC dealership",
+    )
+
+    # load the instance config, if it exists, when not testing
+    if config is None:
+        flask_app.config.from_pyfile('config.py', silent=True)
+    else:
         flask_app.config.from_mapping(config)
+
 
     # Set flask config variable for "rich" loggin from environment variable.
     flask_app.config.from_envvar("RICH_LOGGING", silent=True)
 
     # Init db connection
     init_db(flask_app)
-    
+
+    from . import auth
+    flask_app.register_blueprint(auth.bp)
+
     # Register blueprints
     from . import views  # pylint: disable=import-outside-toplevel
     flask_app.register_blueprint(views.bp, url_prefix='')
