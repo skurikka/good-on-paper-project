@@ -49,9 +49,21 @@ Made development branch.
 
 ### Week 1
 
+Participated in making of the stakeholder cards and user stories.
+
+Started to set up my local development environment.
+
 ### Week 2
 
+Set up Azure environment (resource group, container registry, deployment target) and pipeline. Finished the local development environment.
+
 ### Week 3
+
+Configured mongoDB to work in my local container.
+
+Added user registeration, login and logout functionalities to site. Also made the base.html template and other required templates. Added css files and made UI look better.
+
+Started to set up logging and monitoring.
 
 ### Week 4
 

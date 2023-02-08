@@ -73,15 +73,6 @@ def register():
         birthday = request.form.get('birthday', False)
         terms = request.form.get('terms', False)
 
-        date = datetime.strptime(birthday, '%Y-%m-%d')
-        #today = datetime.now()
-        today = datetime.strptime('2024-02-29', '%Y-%m-%d')
-        past_date = today - relativedelta(years=18)
-
-        print("date:", date)
-        print("today:", today)
-        print("past_date:", past_date)
-
         error = None
 
         if not email:
@@ -92,10 +83,16 @@ def register():
             error = 'Passwords do not match.'
         elif not terms:
             error = 'You must agree to the terms.'
-        elif not birthday:
+        
+        if not birthday:
             error = 'Day of birth is required.'
-        elif date > past_date:
-            error = 'You have to be 18 years old to register.'
+        else:
+            date = datetime.strptime(birthday, '%Y-%m-%d')
+            today = datetime.now()
+            past_date = today - relativedelta(years=18)
+
+            if date > past_date:
+                error = 'You have to be 18 years old to register.'
 
         if error is None:
             try:
