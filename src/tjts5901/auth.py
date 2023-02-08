@@ -1,5 +1,6 @@
 import functools
 import logging
+import re
 
 from flask import (
     Blueprint, flash, redirect, render_template, request, session, url_for
@@ -74,6 +75,7 @@ def register():
         terms = request.form.get('terms', False)
 
         error = None
+        special_characters = '!@#$%&()-_[]{};:"./<>?'
 
         if not email:
             error = 'Email is required.'
@@ -82,7 +84,17 @@ def register():
         elif password != password2:
             error = 'Passwords do not match.'
         elif len(password) < 7 :
-            error = 'Password must be atleast 7 characters long!'
+            error = 'Password must be atleast 7 characters long'
+        elif len(password) > 30 :
+            error = 'Password must be equals or shorter than 30 characters'
+        elif not re.search("[a-z]", password):
+            error = 'Password must be between letters [a-z]'
+        elif not re.search("[A-Z]", password):
+            error = 'Password must contain one uppercase letter'
+        elif not re.search("[0-9]", password):
+            error = 'Password must contain one number'
+        elif not any(map(lambda x: x in password, special_characters)):
+            error = 'Password must contain atleast one special character: ' + special_characters
         elif not terms:
             error = 'You must agree to the terms.'
         
