@@ -1,18 +1,63 @@
 import functools
+import logging
+
+from flask import (
+    Blueprint, flash, redirect, render_template, request, session, url_for
+)
+
+from flask_login import (
+    LoginManager,
+    login_user,
+    logout_user,
+    login_required,
+    current_user,
+)
+
+from sentry_sdk import set_user
+
+
+from mongoengine import DoesNotExist
 
 from passlib.hash import pbkdf2_sha256
 
-from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
-)
-from werkzeug.security import check_password_hash, generate_password_hash
-
-from mongoengine import errors
-
 from .models import User
+
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
+logger = logging.getLogger(__name__)
+
+
+def init_auth(app):
+    """
+    Integrate authentication into the application.
+    """
+    app.register_blueprint(bp)
+
+    login_manager = LoginManager()
+    login_manager.login_view = 'auth.login'
+    login_manager.user_loader(load_logged_in_user)
+
+    login_manager.init_app(app)
+
+    logger.debug("Initialized authentication")
+
+
+def load_logged_in_user(user_id):
+    """
+    Load a user from the database, given the user's id.
+    """
+    try:
+        user = User.objects.get(id=user_id)
+        set_user({"id": str(user.id), "email": user.email})
+
+    except DoesNotExist:
+        logger.error("User not found: %s", user_id)
+        return None
+
+    return user
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
@@ -25,24 +70,39 @@ def register():
         email = request.form['email']
         password = request.form['password']
         password2 = request.form['conf-password']
+        birthday = request.form.get('birthday', False)
         terms = request.form.get('terms', False)
+
+        date = datetime.strptime(birthday, '%Y-%m-%d')
+        #today = datetime.now()
+        today = datetime.strptime('2024-02-29', '%Y-%m-%d')
+        past_date = today - relativedelta(years=18)
+
+        print("date:", date)
+        print("today:", today)
+        print("past_date:", past_date)
 
         error = None
 
         if not email:
-            error = 'Error: Email is required.'
+            error = 'Email is required.'
         elif not password:
-            error = 'Error: Password is required.'
+            error = 'Password is required.'
         elif password != password2:
-            error = 'Error: Passwords do not match.'
+            error = 'Passwords do not match.'
         elif not terms:
-            error = 'Error: You must agree to the terms.'
+            error = 'You must agree to the terms.'
+        elif not birthday:
+            error = 'Day of birth is required.'
+        elif date > past_date:
+            error = 'You have to be 18 years old to register.'
 
         if error is None:
             try:
                 user = User(
-                    email = email,
-                    password = pbkdf2_sha256.encrypt(password)
+                    email=email,
+                    password=pbkdf2_sha256.hash(password),
+                    birthday=birthday
                 )
 
                 user.save()
@@ -54,22 +114,63 @@ def register():
                 return redirect(url_for("auth.login"))
 
         print("Could not register user:", error)
-        flash(error)
+        flash(error, 'error')
 
     return render_template('auth/register.html')
 
 
-@bp.route("/login")
+@bp.route("/login", methods=('GET', 'POST'))
 def login():
     """
     Login page.
 
     """
+    print("Entered login")
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        error = None
+        print("requested email:", email)
+        print("requested password:", password)
+        try:
+            user = User.objects.get(email=email)
+        except DoesNotExist:
+            error = 'Incorrect email.'
+
+        if user is None:
+            error = 'Incorrect email.'
+        elif not pbkdf2_sha256.verify(password, user['password']):
+            error = 'Incorrect password.'
+
+        if error is None:
+            remember_me = bool(request.form.get("remember-me", False))
+            if login_user(user, remember=remember_me):
+
+                flash(f"Hello {email}, You have been logged in.", 'success')
+
+                next = request.args.get('next')
+                # Better check that the user actually clicked on a relative link
+                # or else they could redirect you to a malicious website!
+                if next is None or not next.startswith('/'):
+                    next = url_for('views.index')
+
+                return redirect(next)
+            else:
+                error = "Error logging in."
+
+        logger.info("Error logging user in: %r: Error: %s", email, error)
+        flash(error, 'error')
     return render_template('auth/login.html')
 
-@bp.route("/logout")
-def logout() -> None:
-    """
-    Logout page.
 
+@bp.route("/logout")
+@login_required
+def logout():
     """
+    Log out the current user.
+
+    Also removes the "remember me" cookie.
+    """
+    logout_user()
+    flash("You have been logged out.", 'success')
+    return redirect(url_for('auth.login'))

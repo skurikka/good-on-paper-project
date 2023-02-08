@@ -7,8 +7,10 @@ Flask tutorial: https://flask.palletsprojects.com/en/2.2.x/tutorial/
 
 """
 
+import logging
 from os import environ
 from typing import Dict, Optional
+from datetime import date
 
 from dotenv import load_dotenv
 from flask import (
@@ -32,7 +34,8 @@ def create_app(config: Optional[Dict] = None) -> Flask:
 
     flask_app.config.from_mapping(
         SECRET_KEY='dev',
-        BRAND="Hill Valley DMC dealership",
+        BRAND="Good on paper bid",
+        NOW=date.today(),
     )
 
     # load the instance config, if it exists, when not testing
@@ -41,15 +44,21 @@ def create_app(config: Optional[Dict] = None) -> Flask:
     else:
         flask_app.config.from_mapping(config)
 
+    # Initialize logging early, so that we can log the rest of the initialization.
+    from .logging import init_logging  # pylint: disable=import-outside-toplevel
+    init_logging(flask_app)
 
     # Set flask config variable for "rich" loggin from environment variable.
     flask_app.config.from_envvar("RICH_LOGGING", silent=True)
 
+    init_logging(flask_app)
+
     # Init db connection
     init_db(flask_app)
 
-    from . import auth
-    flask_app.register_blueprint(auth.bp)
+    from .auth import init_auth
+    init_auth(flask_app)
+
 
     # Register blueprints
     from . import views  # pylint: disable=import-outside-toplevel
@@ -82,7 +91,10 @@ def server_info() -> Response:
     running correctly.
     """
 
+    database_ping: bool = False
+
     response = {
+        "database_connectable": database_ping,
         "version": get_version(),
         "build_date": environ.get("BUILD_DATE", None)
     }

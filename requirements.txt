@@ -4,11 +4,17 @@ importlib-metadata
 # Framework and libraries
 flask
 python-dotenv
-
+flask-login
+passlib
 flask-mongoengine
+python-dateutil
 
 # Git hooks
 pre-commit
+
+# Sentry for error reporting
+sentry-sdk[flask]
+sentry-sdk[pymongo]
 
 # More production-ready web server
 #gunicorn

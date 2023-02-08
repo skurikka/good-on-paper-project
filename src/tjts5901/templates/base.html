@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}{% endblock %} - Good on paper</title>
+    <title>{% block title %}{% endblock %} - {{config['BRAND']}}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   </head>
   <body>
@@ -17,8 +17,8 @@
                     <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('views.index') }}">Home</a>
                     </li>
-                    {% if g.user %}
-                        <li class="nav-item"><span>{{ g.user['email'] }}</span>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item"><span>{{ current_user['email'] }}</span></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
                     {% else %}
                         <li class="nav-item"><a  class="nav-link"href="{{ url_for('auth.register') }}">Register</a>
@@ -31,16 +31,30 @@
 
     <main>
         <div class="container content">
+            {% if current_user.is_authenticated %}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}"><span>{{ message }}</span></div>
+                    {% endfor %}
+                {% endwith %}
+            {% endif %}
+
             <header>
             {% block header %}
-                <h1>Good on paper - Bidding site</h1>
+                <h1>{{config['BRAND']}}</h1>
             {% endblock %}
             </header>
-            {% for message in get_flashed_messages() %}
-            <div class="flash flash-error"><span>{{ message }}</span></div>
-            {% endfor %}
+
+            {% if not current_user.is_authenticated %}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}"><span>{{ message }}</span></div>
+                    {% endfor %}
+                {% endwith %}
+            {% endif %}
+            
             {% block content %}
-                <p>Start by registering or login in.</p>
+                <p>Get started by logging in or registering.</p>
                 <figure>
                     <img src="{{ url_for('static', filename='images/front-small.png') }}"/>
                 </figure>
