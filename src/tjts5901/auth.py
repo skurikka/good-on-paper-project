@@ -81,6 +81,8 @@ def register():
             error = 'Password is required.'
         elif password != password2:
             error = 'Passwords do not match.'
+        elif len(password) < 7 :
+            error = 'Password must be atleast 7 characters long!'
         elif not terms:
             error = 'You must agree to the terms.'
         

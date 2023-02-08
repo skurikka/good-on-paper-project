@@ -14,6 +14,7 @@ def init_db(app) -> None:
     if mongodb_url is not None:
         app.config["MONGODB_SETTINGS"] = {
             "host": mongodb_url,
+            "db": ""
         }
         logger.info("Database connection string found, using it.",
                     # You can use the `extra` parameter to add extra information to the log message.
