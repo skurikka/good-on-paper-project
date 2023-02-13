@@ -115,3 +115,34 @@ figure > img {
     display: inline-block;
     font-weight: 700;
 }
+
+.table tr {
+    width: 100%;
+}
+
+.table td {
+    width: 20%;
+}
+
+.table {
+    width: 100%;
+    text-align: left;
+}
+
+#new-button {
+    display: inline-block;
+    margin: 10px;
+    margin-bottom: 35px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    padding-top: 4em;
+}
+
+.pagination ul {
+    list-style: none;
+    list-style-position: outside;
+    padding: 0;
+}

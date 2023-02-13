@@ -4,6 +4,12 @@
     max-width: 300px;
 }
 
+#sell-items, #edit-items {
+    width: 100%;
+    justify-self: center;
+    max-width: 500px;
+}
+
 form {
     display: flex;
     flex-direction: column;
@@ -20,7 +26,7 @@ label {
     font-size: 14px;
 }
 
-input {
+input  {
     padding: 6px 10px 6px 10px;
     border-radius: 30px;
     border-width: 1px;
@@ -39,4 +45,18 @@ input[type="checkbox"] {
 
 input[type="checkbox"]:checked {
     accent-color: #16271F;
+}
+
+#sell-item-form {
+    margin: 10px;
+}
+
+textarea {
+    resize: none;
+    border-radius: 15px;
+    margin-top: 4px;
+    font-size: 16px;
+    font-family: 'Roboto Mono', monospace;
+    margin-bottom: 1em;
+    padding: 6px 10px 6px 10px;
 }

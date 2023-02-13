@@ -60,9 +60,10 @@ def create_app(config: Optional[Dict] = None) -> Flask:
     init_auth(flask_app)
 
 
-    # Register blueprints
-    from . import views  # pylint: disable=import-outside-toplevel
-    flask_app.register_blueprint(views.bp, url_prefix='')
+    from . import items
+    flask_app.register_blueprint(items.bp)
+    flask_app.add_url_rule('/', endpoint='index')
+
 
     return flask_app
 

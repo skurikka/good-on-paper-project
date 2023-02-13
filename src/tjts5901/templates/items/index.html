@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Items{% endblock %}</h1>
+{% if current_user %}
+<a class="btn" id="new-button" href="{{ url_for('items.sell') }}">New item</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th></th>
+        <th>Title</th>
+        <th>Starting Bid</th>
+        <th>Seller</th>
+        <th>Closes At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items.items %}
+      <tr>
+        <td>
+          {% if current_user == item.seller %}
+            <a class="action btn btn-primary" href="{{ url_for('items.update', id=item['id']) }}">Edit</a>
+          {% endif %}
+        </td>
+        <td>{{ item.title }}</td>
+        <td>{{ item.starting_bid }}</td>
+        <td>{{ item.seller.email }}</td>
+        <td>{{ item.closes_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <nav  class="pagination" aria-label="Page navigation">
+    <ul>
+      {% for page in items.iter_pages() %}
+      <li class="page-item {% if page == items.page %}active{% endif %}">
+        <a class="page-link" href="{{ url_for('items.index', page=page) }}">{{ page }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </nav>
+</div>
+
+
+{% endblock %}

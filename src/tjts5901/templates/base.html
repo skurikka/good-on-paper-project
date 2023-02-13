@@ -10,18 +10,20 @@
     <header class="header-section">
         <div class="container">
             <nav class="navbar" id="main-navigation">
-                <a class="navbar-brand" href="{{ url_for('views.index') }}">
+                <a class="navbar-brand" href="{{ url_for('items.index') }}">
                     <img src="{{ url_for('static', filename='images/logoipsum-221.svg') }}">
                 </a>
                 <ul class="nav">
                     <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('views.index') }}">Home</a>
+                    <a class="nav-link" href="{{ url_for('items.index') }}">Home</a>
                     </li>
                     {% if current_user.is_authenticated %}
                         <li class="nav-item"><span>{{ current_user['email'] }}</span></li>
+                        <li class="nav-link"><a  href="{{ url_for('items.sell') }}">Sell</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
                     {% else %}
                         <li class="nav-item"><a  class="nav-link"href="{{ url_for('auth.register') }}">Register</a>
+                        <li class="nav-link"><a  href="{{ url_for('auth.login') }}">Sell</a></li>
                         <li class="nav-item"><a  class="nav-link"href="{{ url_for('auth.login') }}">Log In</a>
                     {% endif %}
                 </ul>

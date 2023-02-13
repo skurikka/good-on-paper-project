@@ -1,6 +1,7 @@
-import functools
 import logging
-import re
+
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from flask import (
     Blueprint, flash, redirect, render_template, request, session, url_for
@@ -22,9 +23,6 @@ from mongoengine import DoesNotExist
 from passlib.hash import pbkdf2_sha256
 
 from .models import User
-
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -83,6 +81,7 @@ def register():
             error = 'Password is required.'
         elif password != password2:
             error = 'Passwords do not match.'
+            """
         elif len(password) < 7 :
             error = 'Password must be atleast 7 characters long'
         elif len(password) > 30 :
@@ -95,9 +94,10 @@ def register():
             error = 'Password must contain one number'
         elif not any(map(lambda x: x in password, special_characters)):
             error = 'Password must contain atleast one special character: ' + special_characters
+        """
         elif not terms:
             error = 'You must agree to the terms.'
-        
+     
         if not birthday:
             error = 'Day of birth is required.'
         else:
@@ -122,6 +122,7 @@ def register():
             except Exception as exc:
                 error = f"Error creating user: {exc!s}"
             else:
+                flash("Registration successful", 'success')
                 return redirect(url_for("auth.login"))
 
         print("Could not register user:", error)
@@ -163,7 +164,7 @@ def login():
                 # Better check that the user actually clicked on a relative link
                 # or else they could redirect you to a malicious website!
                 if next is None or not next.startswith('/'):
-                    next = url_for('views.index')
+                    next = url_for('items.index')
 
                 return redirect(next)
             else:
