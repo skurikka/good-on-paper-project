@@ -166,3 +166,4 @@ _docs/
 .env
 .DS_Store
 dotenv
+.gitlab-ci.yml
