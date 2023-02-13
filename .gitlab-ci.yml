@@ -6,7 +6,7 @@ variables:
   ## Name for the generated image. Change this if you wish, but watch out
   ## for special characters and spaces!
   DOCKER_IMAGE_NAME: ${DOCKER_REGISTRY}/tjts5901
-  DOCKER_TAG: developement
+  DOCKER_TAG: latest
 
   ## (Optional) More verbose output from pipeline. Enabling it might reveal secrets.
   #CI_DEBUG_TRACE: "true"
