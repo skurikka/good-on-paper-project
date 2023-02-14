@@ -4,7 +4,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from flask import (
-    Blueprint, flash, redirect, render_template, request, session, url_for
+    Blueprint, flash, redirect, render_template, request, session, url_for, abort
 )
 
 from flask_login import (
@@ -22,7 +22,7 @@ from mongoengine import DoesNotExist
 
 from passlib.hash import pbkdf2_sha256
 
-from .models import User
+from .models import User, Item
 
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -186,3 +186,22 @@ def logout():
     logout_user()
     flash("You have been logged out.", 'success')
     return redirect(url_for('auth.login'))
+
+@bp.route('/profile/<email>')
+@login_required
+def profile(email):
+    """
+    Show the user's profile page for the given email.
+
+    If the email is 'me', then the current user's profile is shown.
+    """
+    if email == 'me':
+        email = current_user.email
+
+    user: User = User.objects.get_or_404(email=email)
+
+    # List the items user has created
+    items = Item.objects(seller=user).all()
+
+    return render_template('auth/profile.html', user=user, items=items)
+

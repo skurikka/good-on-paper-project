@@ -43,9 +43,8 @@ a:hover {
     color: #50727C;
 }
 
-.btn, button {
-    background-color: #16271F;
-    color: #F0F7F4;
+.btn {
+    display: inline-block;
     padding: 0.5em 1.5em 0.5em 1.5em;
     font-family: 'Roboto Mono', monospace;
     font-weight: 600;
@@ -58,10 +57,41 @@ a:hover {
     width: fit-content;
 }
 
-.btn:hover, button:hover {
-    background-color: #F0F7F4;
+.btn:hover {
+    background-color: transparent;
     color: #16271F;
     cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #16271F;
+    color: #F0F7F4;
+}
+
+.btn-primary:hover {
+    background-color: transparent;
+    color: #16271F;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #16271F;
+}
+
+.btn-secondary:hover {
+    background-color: #16271F;;
+    color: #F0F7F4;
+}
+
+.btn-danger {
+    background-color: transparent;
+    color: #D1462F;
+    border-color: #D1462F;
+}
+
+.btn-danger:hover {
+    background-color: #D1462F;;
+    color: #F0F7F4;
 }
 
 .content {
@@ -145,4 +175,28 @@ figure > img {
     list-style: none;
     list-style-position: outside;
     padding: 0;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#user-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.buttons {
+    width: 100%;
+    justify-self: center;
+    align-items: center;
 }
