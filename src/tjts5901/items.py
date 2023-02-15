@@ -157,7 +157,7 @@ def view(id):
 
         flash("This item is closing soon! Act now! Now! Now!")
 
-    return render_template('items/view.html', item=item, min_bid=min_bid, winning_bid=winning_bid.amount, bid_history=bid_history)
+    return render_template('items/view.html', item=item, min_bid=min_bid, winning_bid=winning_bid, bid_history=bid_history)
 
 
 

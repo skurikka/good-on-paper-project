@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 
 {% block header %}
-    <div class="px-4">
-        <h1 class="mr-auto">{% block title %}{{item.title}}{% endblock %}</h1>
-        <p>by <a href="{{ url_for('auth.profile', email=item.seller.email) }}">{{item.seller.email}}</a></p>
-    </div>
+<div class="px-4">
+    <h1 class="mr-auto">{% block title %}{{item.title}}{% endblock %}</h1>
+    <p>by <a href="{{ url_for('auth.profile', email=item.seller.email) }}">{{item.seller.email}}</a></p>
+</div>
 {% endblock %}
 
 {% block content %}
 <div class="grid grid-cols-1 md:grid-cols-3 gap-y-8 gap-x-8 md:gap-y-0 mt-8">
-    
+
     <figure class="aspect-video overflow-hidden m-0 md:col-span-2">
         {# Maybe on future we'll have image support. Feels like an important feature to have. #}
         <img src="https://via.placeholder.com/1600x900" alt="..." class="w-full h-full object-cover">
@@ -17,13 +17,14 @@
 
     <div class="md:col-span-1 text-left bg-white p-4 rounded-[15px]">
         <h2 class="text-2xl">Place a bid</h2>
-    {% if item.is_open %}
+        {% if item.is_open %}
         <div class="flex flex-col">
             <p><span class="font-bold">Closes at</span> <time datetime="{{ item.closes_at.isoformat() }}">{{ item.closes_at.strftime("%d.%m.%y %H:%M") }}</time></p>
-            <p><span class="font-bold">Added at</span> <time datetime="{{ item.created_at.isoformat() }}">{{ item.created_at.strftime("%d.%m.%y %H:%M") }}</time></p>            
+            <p><span class="font-bold">Added at</span> <time datetime="{{ item.created_at.isoformat() }}">{{ item.created_at.strftime("%d.%m.%y %H:%M") }}</time></p>
             <p class="font-bold text-xl inline-block my-4"><span>Starting bid</span> {{ item.starting_bid }}&euro;</p>
-            <p class="font-bold text-xl inline-block my-4"><span>Highest bid</span> {{ winning_bid}}&euro;</p>
-
+            {% if winning_bid is not none %}
+            <p class="font-bold text-xl inline-block my-4"><span>Highest bid</span> {{ winning_bid.amount }}&euro;</p>
+            {% endif %}
             <form class="w-fit pb-4" action="{{ url_for('items.bid', id=item.id)}}" method="post">
                 <div class="form-group row">
                     <label for="bid" class="">Your bid</label>
@@ -41,19 +42,21 @@
             </form>
             <h3 class="text-xl mt-4">Bid history</h3>
             <ul>
-                {%for bid in bid_history %}
-                {% if not loop.first %}
-                <li>{{ bid.amount }}&euro; at {{ bid.created_at.strftime("%d.%m.%y %H:%M:%S") }}</li>
+                {% if bid_history is not none %}
+                    {%for bid in bid_history %}
+                        {% if not loop.first %}
+                            <li>{{ bid.amount }}&euro; at {{ bid.created_at.strftime("%d.%m.%y %H:%M:%S") }}</li>
+                        {% endif %}
+                    {% endfor %}
                 {% endif %}
-                {% endfor %}
             </ul>
         </div>
 
-    {% else %}
+        {% else %}
         <div class="alert alert-info">
             <strong>Item is no longer at sale.</strong> Next time, act faster!
         </div>
-    {% endif %}
+        {% endif %}
     </div>
 
     <div class="md:col-span-2 text-left">
@@ -69,7 +72,7 @@
             <a href="mailto:{{item.seller.email}}" class="btn btn-primary btn-sm"><i class="fa-regular fa-envelope"></i> Contact seller</a>
             <a href="tel:{{item.seller.phone}}" class="btn btn-primary btn-sm"><i class="fa-solid fa-phone"></i> Call seller</a>
         </div>
-    </div>  
+    </div>
 </div>
 
 {% endblock %}
