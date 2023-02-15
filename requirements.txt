@@ -8,6 +8,7 @@ flask-login
 passlib
 flask-mongoengine
 python-dateutil
+pytailwindcss
 
 # Git hooks
 pre-commit

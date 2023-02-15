@@ -1,21 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&display=swap');
 
 @import "navigation.css";
 @import "form.css";
 
-@media screen and (min-width: 1024px) {
-    .container {
-        max-width: 1024px;
-        margin-left: auto;
-        margin-right: auto;
-        width: 100%;
-    }
+.container {
+    @apply mx-auto w-full;
 }
 
-.container {
-    padding-left: 10px;
-    padding-right: 10px;
-}
+h1 { @apply text-5xl; }
+h2 { @apply text-4xl; }
+h3 { @apply text-3xl; }
+h4 { @apply text-2xl; }
+h5 { @apply text-xl; }
 
 body {
     background-color: #F0F7F4;
@@ -43,25 +43,51 @@ a:hover {
     color: #50727C;
 }
 
-.btn, button {
-    background-color: #16271F;
-    color: #F0F7F4;
-    padding: 0.5em 1.5em 0.5em 1.5em;
+.btn {
+    @apply inline-block px-6 py-1.5 font-bold no-underline text-lg border-2 border-primary-700 rounded-[30px] w-fit;
     font-family: 'Roboto Mono', monospace;
-    font-weight: 600;
-    text-decoration: none;
-    font-size: 16px;
-    border-width: 2px;
-    border-style: solid;
-    border-color: #16271F;
-    border-radius: 30px;
-    width: fit-content;
 }
 
-.btn:hover, button:hover {
-    background-color: #F0F7F4;
-    color: #16271F;
-    cursor: pointer;
+.btn:hover {
+    @apply text-primary-700 cursor-pointer;
+    background-color: transparent;
+}
+
+.btn-primary {
+    @apply bg-primary-700 text-primary-100;
+}
+
+.btn-primary:hover {
+    @apply text-primary-700;
+    background-color: transparent;
+}
+
+.btn-secondary {
+    @apply text-primary-700;
+    background-color: transparent;
+}
+
+.btn-secondary:hover {
+    @apply bg-primary-700 text-primary-100;
+}
+
+.btn-danger {
+    @apply text-red border-red;
+    background-color: transparent;
+}
+
+.btn-danger:hover {
+    @apply bg-red text-primary-100;
+}
+
+.btn-card {
+    @apply bg-primary-700 text-primary-100 inline-block px-6 py-2 font-bold no-underline text-lg border-b-2 border-r-2 border-primary-700 rounded-br-[15px] w-fit;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.btn-card:hover {
+    @apply text-primary-700;
+    background-color: transparent;
 }
 
 .content {
@@ -116,25 +142,6 @@ figure > img {
     font-weight: 700;
 }
 
-.table tr {
-    width: 100%;
-}
-
-.table td {
-    width: 20%;
-}
-
-.table {
-    width: 100%;
-    text-align: left;
-}
-
-#new-button {
-    display: inline-block;
-    margin: 10px;
-    margin-bottom: 35px;
-}
-
 .pagination {
     display: flex;
     justify-content: center;
@@ -142,7 +149,135 @@ figure > img {
 }
 
 .pagination ul {
-    list-style: none;
-    list-style-position: outside;
-    padding: 0;
+    @apply list-none flex gap-4;
+}
+
+.pagination a {
+    @apply no-underline;
+}
+
+.active {
+    @apply underline decoration-2 underline-offset-2;
+}
+
+
+
+
+
+
+
+
+/* NAVIGATION */
+
+nav {
+    @apply flex flex-col gap-4 md:gap-0 sm:flex-row sm:justify-between sm:items-center items-center py-2 text-lg;
+}
+
+#main-navigation ul {
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+    gap: 1.5em;
+    align-items: center;
+}
+
+#main-navigation a {
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+#main-navigation a:hover {
+    text-transform: uppercase;
+    text-decoration-line: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+}
+
+.header-section {
+    background-color: white;
+    filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
+    position: fixed;
+    width: 100%;
+    top: 0;
+}
+
+footer {
+    background-color: #16271F;
+    color: white;
+    margin-top: 2em;
+    padding-top: 2em;
+    padding-bottom: 2em;
+}
+
+
+
+
+
+
+
+
+/* FORMS*/
+
+#register, #login {
+    width: fit-content;
+    justify-self: center;
+    max-width: 300px;
+}
+
+#sell-items, #edit-items {
+    width: 100%;
+    justify-self: center;
+    max-width: 500px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 100%;
+}
+
+label + input {
+    margin-bottom: 1em;
+}
+
+label {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+input  {
+    @apply py-1.5 px-2.5;
+    border-radius: 30px;
+    border-width: 1px;
+    margin-top: 4px;
+    font-size: 16px;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.terms, .remember {
+    margin-bottom: 1.5em;
+}
+
+input[type="checkbox"] {
+    margin-right: 1em;
+}
+
+input[type="checkbox"]:checked {
+    accent-color: #16271F;
+}
+
+#sell-item-form {
+    margin: 10px;
+}
+
+textarea {
+    resize: none;
+    border-radius: 15px;
+    margin-top: 4px;
+    font-size: 16px;
+    font-family: 'Roboto Mono', monospace;
+    margin-bottom: 1em;
+    padding: 6px 10px 6px 10px;
+    border-width: 1px;
 }
