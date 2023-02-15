@@ -72,6 +72,15 @@ class Item(db.Document):
         """
         return self.closes_at > datetime.utcnow()
 
+    @property
+    def get_excerpt(self):
+        if len(self.description) < 50:
+            excerpt = self.description
+        else:
+            excerpt = self.description[ 0 : 50 ] + '...'
+        
+        return excerpt
+
 class Bid(db.Document):
     """
     A model for bids on items.

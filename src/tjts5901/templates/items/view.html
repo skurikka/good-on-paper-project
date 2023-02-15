@@ -1,96 +1,75 @@
 {% extends 'base.html' %}
 
 {% block header %}
-    <div class="container">
-        <div class="d-flex align-items-center">
-            <h1 class="mr-auto">{% block title %}{{item.title}}{% endblock %}</h1>
-        </div>
+    <div class="px-4">
+        <h1 class="mr-auto">{% block title %}{{item.title}}{% endblock %}</h1>
+        <p>by <a href="{{ url_for('auth.profile', email=item.seller.email) }}">{{item.seller.email}}</a></p>
     </div>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="card mb-3">
-        <div class="row no-gutters">
-            <div class="col-md-4">
-                {# Maybe on future we'll have image support. Feels like an important feature to have. #}
-                <img src="https://via.placeholder.com/1600x900" alt="...">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body border-0">
-                    <h5 class="card-title">{{item.title}} by <a href="#">{{item.seller.email}}</a></h5>
-                    <p class="card-text">
-                        {% if item.is_open %}
-                            <div class="form-group row">
-                                <div class="col-sm-4 col-form-label">
-                                    {# TODO: Follow dark patterns and change this to "time left" #}
-                                    Closes at
-                                </div>
-                                <div class="col-sm-8">
-                                    <time datetime="{{ item.closes_at.isoformat() }}">{{ item.closes_at.strftime("%d.%m.%y %H:%M") }}</time>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-sm-4 col-form-label">
-                                    Added at
-                                </div>
-                                <div class="col-sm-8">
-                                    <time datetime="{{ item.created_at.isoformat() }}">{{ item.created_at.strftime("%d.%m.%y %H:%M") }}</time>
-                                </div>
-                            </div>
-                            <hr /><!-- ------------------------------------------------ -->
-                            <div class="form-group row">
-                                <div class="col-sm-4 col-form-label">
-                                    {# TODO: Follow dark patterns and change this to "time left" #}
-                                    Starting bid
-                                </div>
-                                <div class="col-sm-8">
-                                    <strong>{{ min_bid }} &euro;</strong>
-                                </div>
-                            </div>
-                            <form action="{{ url_for('items.bid', id=item.id)}}" method="post">
-                                <div class="form-group row">
-                                    <label for="bid" class="col-sm-3 col-form-label">Your bid</label>
-                                    <div class="col-sm-6">
-                                        <label class="sr-only" for="bid">Bid amount</label>
-                                        <div class="input-group">
-                                            <input type="number" name="amount" class="" id="bid" placeholder="Bid amount" min="{{ min_bid }}" required> &euro;
-                                        </div>
-
-                                        <small class="form-text text-muted">
-                                            Minimum bid is {{ min_bid }} &euro;
-                                        </small>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <button type="submit" class="btn btn-info btn-lg btn-block border-dark">Bid</button>
-                                    </div>
-                                </div>
-                            </form>
-
+<div class="grid grid-cols-1 md:grid-cols-3 gap-y-8 gap-x-8 md:gap-y-0 mt-8">
     
-                        {% else %}
-                            <div class="alert alert-info">
-                                <strong>Item is no longer at sale.</strong> Next time, act faster!
-                            </div>
-                        {% endif %}
-                    </p>
-                    <hr />
-                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                    {# Contact seller buttons #}
-                    <div class="col">
-                        <a href="mailto:{{item.seller.email}}" class="btn btn-primary btn-sm"><i class="fa-regular fa-envelope"></i>Contact seller</a>
-                        <a href="tel:{{item.seller.phone}}" class="btn btn-primary btn-sm"><i class="fa-solid fa-phone"></i>Call seller</a>
-                    </div>
+    <figure class="aspect-video overflow-hidden m-0 md:col-span-2">
+        {# Maybe on future we'll have image support. Feels like an important feature to have. #}
+        <img src="https://via.placeholder.com/1600x900" alt="..." class="w-full h-full object-cover">
+    </figure>
 
+    <div class="md:col-span-1 text-left bg-white p-4 rounded-[15px]">
+        <h2 class="text-2xl">Place a bid</h2>
+    {% if item.is_open %}
+        <div class="flex flex-col">
+            <p><span class="font-bold">Closes at</span> <time datetime="{{ item.closes_at.isoformat() }}">{{ item.closes_at.strftime("%d.%m.%y %H:%M") }}</time></p>
+            <p><span class="font-bold">Added at</span> <time datetime="{{ item.created_at.isoformat() }}">{{ item.created_at.strftime("%d.%m.%y %H:%M") }}</time></p>            
+            <p class="font-bold text-xl inline-block my-4"><span>Starting bid</span> {{ item.starting_bid }}&euro;</p>
+            <p class="font-bold text-xl inline-block my-4"><span>Highest bid</span> {{ winning_bid}}&euro;</p>
+
+            <form class="w-fit pb-4" action="{{ url_for('items.bid', id=item.id)}}" method="post">
+                <div class="form-group row">
+                    <label for="bid" class="">Your bid</label>
+                    <div class="flex flex-col">
+                        <label class="sr-only" for="bid">Bid amount</label>
+                        <div>
+                            <input type="number" name="amount" class="" id="bid" placeholder="Bid amount" min="{{ min_bid }}" required> &euro;
+                        </div>
+                        <small class="form-text text-muted">
+                            Minimum bid is {{ min_bid }}&euro;
+                        </small>
+                    </div>
+                    <button type="submit" class="btn btn-secondary mt-4">Bid</button>
                 </div>
-            </div>
+            </form>
+            <h3 class="text-xl mt-4">Bid history</h3>
+            <ul>
+                {%for bid in bid_history %}
+                {% if not loop.first %}
+                <li>{{ bid.amount }}&euro; at {{ bid.created_at.strftime("%d.%m.%y %H:%M:%S") }}</li>
+                {% endif %}
+                {% endfor %}
+            </ul>
         </div>
-        <div clas="row">
-            <div class="col-md-12">
-                <p>{{item.description}}</p>
-            </div>
+
+    {% else %}
+        <div class="alert alert-info">
+            <strong>Item is no longer at sale.</strong> Next time, act faster!
         </div>
+    {% endif %}
     </div>
+
+    <div class="md:col-span-2 text-left">
+        <div class="py-4">
+            <h2 class="text-2xl">Description</h2>
+            <p>{{item.description}}</p>
+        </div>
+        <hr />
+        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        {# Contact seller buttons #}
+        <div class="py-4">
+            <p class="text-xl block mb-4"><span class="font-bold">Visit seller profile:</span> <a href="{{ url_for('auth.profile', email=item.seller.email) }}">{{item.seller.email}}</a></p>
+            <a href="mailto:{{item.seller.email}}" class="btn btn-primary btn-sm"><i class="fa-regular fa-envelope"></i> Contact seller</a>
+            <a href="tel:{{item.seller.phone}}" class="btn btn-primary btn-sm"><i class="fa-solid fa-phone"></i> Call seller</a>
+        </div>
+    </div>  
 </div>
 
 {% endblock %}

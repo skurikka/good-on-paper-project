@@ -34,7 +34,7 @@ def create_app(config: Optional[Dict] = None) -> Flask:
 
     flask_app.config.from_mapping(
         SECRET_KEY='dev',
-        BRAND="Good on paper bid",
+        BRAND="Good on paper auction",
         NOW=date.today(),
     )
 

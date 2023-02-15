@@ -95,7 +95,7 @@ def index(page=1):
     # See: http://docs.mongoengine.org/projects/flask-mongoengine/en/latest/custom_queryset.html
     items = Item.objects.filter(closes_at__gt=datetime.utcnow()) \
         .order_by('-closes_at') \
-        .paginate(page=page, per_page=10)
+        .paginate(page=page, per_page=9)
 
     return render_template('items/index.html', items=items)
 
@@ -148,15 +148,16 @@ def view(id):
     # Set the minumum price for the bid form from the current winning bid
     winning_bid = get_winning_bid(item)
     min_bid = get_item_price(item)
+    bid_history = Bid.objects.filter(item = id).order_by('-created_at')
 
-    if item.closes_at < datetime.utcnow() and winning_bid.bidder == g.user:
+    if item.closes_at < datetime.utcnow() and winning_bid.bidder == current_user:
         flash("Congratulations! You won the auction!")
     elif item.closes_at < datetime.utcnow() + timedelta(hours=1):
         # Dark pattern to show enticing message to user
 
         flash("This item is closing soon! Act now! Now! Now!")
 
-    return render_template('items/view.html', item=item, min_bid=min_bid)
+    return render_template('items/view.html', item=item, min_bid=min_bid, winning_bid=winning_bid.amount, bid_history=bid_history)
 
 
 
@@ -233,13 +234,13 @@ def bid(id):
         # instead of g.user
         bid = Bid(
             item=item,
-            bidder=g.user,
+            bidder=current_user,
             amount=amount,
         )
         bid.save()
     except Exception as exc:
-        flash(f"Error placing bid: {exc!s}")
+        flash(f"Error placing bid: {exc!s}", 'error')
     else:
-        flash("Bid placed successfully!")
+        flash("Bid placed successfully!", 'success')
 
     return redirect(url_for('items.view', id=id))

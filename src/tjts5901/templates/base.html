@@ -4,36 +4,35 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %} - {{config['BRAND']}}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='src/main.css') }}">
     <script src="https://kit.fontawesome.com/d610c02987.js" crossorigin="anonymous"></script>
   </head>
   <body>
-    <header class="header-section">
-        <div class="container">
-            <nav class="navbar" id="main-navigation">
-                <a class="navbar-brand" href="{{ url_for('items.index') }}">
+    <header class="header-section relative z-50">
+        <div class="container px-4">
+            <nav id="main-navigation">
+                <a href="{{ url_for('items.index') }}">
                     <img src="{{ url_for('static', filename='images/logoipsum-221.svg') }}">
                 </a>
-                <ul class="nav">
-                    <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('items.index') }}">Home</a>
+                <ul>
+                    <li>
+                    <a href="{{ url_for('items.index') }}">Home</a>
                     </li>
                     {% if current_user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.profile', email='me') }}">{{ current_user['email'] }}</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('items.sell') }}">Sell</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
+                        <li><a href="{{ url_for('auth.profile', email='me') }}">{{ current_user['email'] }}</a></li>
+                        <li><a href="{{ url_for('items.sell') }}">Sell</a></li>
+                        <li><a class="text-red" href="{{ url_for('auth.logout') }}">Log Out</a>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Sell</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
+                        <li><a href="{{ url_for('auth.login') }}">Sell</a></li>
+                        <li><a href="{{ url_for('auth.login') }}">Log In</a>
                     {% endif %}
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main>
-        <div class="container content">
+    <main class="relative z-10">
+        <div class="container content z-20 px-4">
             {% if current_user.is_authenticated %}
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% for category, message in messages %}
@@ -57,18 +56,14 @@
             {% endif %}
             
             {% block content %}
-                <p>Get started by logging in or registering.</p>
-                <figure>
-                    <img src="{{ url_for('static', filename='images/front-small.png') }}"/>
-                </figure>
             {% endblock %}
         </div>
     </main>
 
     <footer>
-        <div class="container">
+        <div class="container px-4">
             {% block footer %}
-                <p>Footer</p>
+                <p class="text-base">Footer</p>
             {% endblock %}
         </div>
 
