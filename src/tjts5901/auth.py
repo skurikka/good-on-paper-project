@@ -22,6 +22,9 @@ from mongoengine import DoesNotExist
 
 from passlib.hash import pbkdf2_sha256
 
+from pyisemail import is_email
+from email_validator import validate_email, EmailNotValidError
+
 from .models import User, Item
 
 
@@ -73,8 +76,19 @@ def register():
         terms = request.form.get('terms', False)
 
         error = None
+        bool_result_with_dns = is_email(email, check_dns=True)
+        is_new_account = True # False for login pages
+
+        try:
+            validation = validate_email(email, check_deliverability=is_new_account)
+            email = validation.email
+        except EmailNotValidError as error_message:
+            error = str(error_message)
+
         special_characters = '!@#$%&()-_[]{};:"./<>?'
 
+        if not bool_result_with_dns:
+            error = 'E-mail is not valid'
         if not email:
             error = 'Email is required.'
         elif not password:
