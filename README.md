@@ -29,6 +29,6 @@ Please see the `docs/tjts5901` folder for more complete documentation.
 
 Please, [fill our form](https://gitlab.jyu.fi/good-on-paper/good-paper-project/-/issues/new) to report any issues.
 
-App:
+## App
 
 https://goodonpaper-app.azurewebsites.net/
