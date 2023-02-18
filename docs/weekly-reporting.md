@@ -22,13 +22,13 @@ Made and assinged issues from user cases.
 
 Made development branch.
 
-### Week 1
-
-### Week 2
-
-### Week 3
 
 ### Week 4
+
+Add non-funtional requirements as issues to the project. Edit existing issues and further specify functional requirements. 
+
+Started working on the final project and presentation
+
 
 ### Week 5
 
