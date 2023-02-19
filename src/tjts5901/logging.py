@@ -27,6 +27,8 @@ from flask.logging import default_handler as flask_handler
 
 from sentry_sdk.integrations.flask import FlaskIntegration
 from sentry_sdk.integrations.pymongo import PyMongoIntegration
+from .utils import get_version
+
 
 
 

@@ -55,6 +55,10 @@ def create_app(config: Optional[Dict] = None) -> Flask:
 
     # Init db connection
     init_db(flask_app)
+    
+    @flask_app.route('/debug-sentry')
+    def trigger_error():
+        division_by_zero = 1 / 0
 
     from .auth import init_auth
     init_auth(flask_app)
