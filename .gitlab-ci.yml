@@ -53,7 +53,7 @@ test:
   variables:
     ## Setup variable pointin to mongo service
     ## Notice: the `mongo` address might not work.
-    MONGO_URL: mongodb://mongodb:27017/tjts5901
+    MONGO_URL: mongodb://mongo/goodonpaperdb-test
 
   ## When job is started, also start these things
   services:
