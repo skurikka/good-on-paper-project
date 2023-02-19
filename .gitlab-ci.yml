@@ -13,6 +13,8 @@ variables:
   ## (Optional) More verbose output from pipeline. Enabling it might reveal secrets.
   #CI_DEBUG_TRACE: "true"
 
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
 
 ## Use buildkit to build the container.
 ## Buildkit: https://github.com/moby/buildkit
