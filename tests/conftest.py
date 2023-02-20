@@ -1,5 +1,8 @@
+from os import environ
 import pytest
 from flask import Flask
+
+environ["FLASK_DEBUG"] = "0"
 
 from tjts5901.app import create_app
 
