@@ -45,3 +45,9 @@ build-backend = "setuptools.build_meta"
 testpaths = [
     "tests",
 ]
+
+[tool.coverage.run]
+branch = true
+source_pkgs = [
+    "tjts5901",
+]
