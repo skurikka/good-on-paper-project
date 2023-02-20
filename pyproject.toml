@@ -28,6 +28,8 @@ dependencies = {file = ["requirements.txt"]}
 [project.optional-dependencies]
 test = [
   "pytest",
+  "coverage",
+  "coverage[toml]",
 ]
 docs = [
   "mkdocs",
