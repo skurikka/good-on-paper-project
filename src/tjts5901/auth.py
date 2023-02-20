@@ -156,6 +156,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         error = None
+        user = None
         print("requested email:", email)
         print("requested password:", password)
         try:
