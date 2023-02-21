@@ -1,6 +1,7 @@
 ## Stage names in the pipeline.
 stages:
   - build
+  - test
   - staging
   - deploy
 
@@ -8,17 +9,19 @@ variables:
   ## Name for the generated image. Change this if you wish, but watch out
   ## for special characters and spaces!
   DOCKER_IMAGE_NAME: ${DOCKER_REGISTRY}/tjts5901
-  DOCKER_TAG: developement
+  DOCKER_TAG: ${CI_COMMIT_REF_SLUG}
 
   ## (Optional) More verbose output from pipeline. Enabling it might reveal secrets.
   #CI_DEBUG_TRACE: "true"
+
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
 
 ## Use buildkit to build the container.
 ## Buildkit: https://github.com/moby/buildkit
 ## Example gitlab-ci buildkit template: https://gitlab.com/txlab/ci-templates
 build:
   stage: build
-  environment: production
   image:
     name: moby/buildkit:v0.10.6-rootless
     entrypoint: ["sh", "-c"]
@@ -45,95 +48,129 @@ build:
           --opt build-arg:CI_COMMIT_SHA=${CI_COMMIT_SHA} \
           --output type=image,name=${DOCKER_IMAGE_NAME}:${DOCKER_TAG},push=true
 
+sast:
+    ## Static Application Security Test
+    ## You can override the included template(s) by including variable overrides
+    ## SAST customization:
+    ##   https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+    stage: test
+
+
+## Run the tests. If any of the tests fails, pipeline is rejected.
+test:
+  stage: test
+  environment: testing
+  image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
+  variables:
+    ## Setup variable pointin to mongo service
+    ## Notice: the `mongo` address might not work.
+    MONGO_URL: mongodb://mongo/goodonpaperdb-test
+
+  ## When job is started, also start these things
+  services:
+    - name: mongo:4.2  # update to reflect same version used on production
+      alias: mongo
+  script:
+      - pip install --disable-pip-version-check -e .[test]
+      ## Run tests with coverage reporting
+      - coverage run -m pytest
+      ## Run basic reporting for badge
+      - coverage report
+      ## Generate detailed report for gitlab annotations.
+      - coverage xml -o coverage.xml
+
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+
 ## Job to setup new staging job.
 deploy to staging:
-  stage: staging
-  ## Only run this stage when main branch receives changes.
-  only:
-    - main
+    stage: staging
+    ## Only run this stage when main branch receives changes.
+    only:
+        - main
 
-  ## Use microsoft provided azure cli image, that contains az cli.
-  image: mcr.microsoft.com/azure-cli
+    ## Use microsoft provided azure cli image, that contains az cli.
+    image: mcr.microsoft.com/azure-cli
 
-  ## Setup the environment variables. The can be accessed through the gitlab
-  ## Deployments -> Environments. Generates url based on the app and branch name.
-  environment:
-    name: $CI_JOB_STAGE
-    url: https://${AZURE_APP_NAME}-${CI_ENVIRONMENT_SLUG}.azurewebsites.net
+    ## Setup the environment variables. The can be accessed through the gitlab 
+    ## Deployments -> Environments. Generates url based on the app and branch name.
+    environment:
+        name: $CI_JOB_STAGE
+        url: https://${AZURE_APP_NAME}-${CI_ENVIRONMENT_SLUG}.azurewebsites.net
 
-  before_script:
-    ## Make sanity check that gitlab variables stage is done.
-    - test -z "${AZURE_SP_NAME}" && (echo "Missing required variable AZURE_SP_NAME. See 'Staging.md'"; exit 1)
-    - test -f "${AZURE_SP_CERT}" || ( echo "AZURE_SP_CERT (${AZURE_SP_CERT}) file is missing!"; exit 1)
+    before_script:
+        ## Make sanity check that gitlab variables stage is done.
+        - test -z "${AZURE_SP_NAME}" && (echo "Missing required variable AZURE_SP_NAME. See 'Staging.md'"; exit 1)
+        - test -f "${AZURE_SP_CERT}" || ( echo "AZURE_SP_CERT (${AZURE_SP_CERT}) file is missing!"; exit 1)
 
-    - test -z "${AZURE_APP_NAME}" && (echo "Missing required variable AZURE_APP_NAME. See 'Staging.md'"; exit 1)
-    - test -z "${AZURE_RESOURCE_GROUP}" && (echo "Missing required variable DOCKER_AUTH_CONFIG. See 'Staging.md'"; exit 1)
+        - test -z "${AZURE_APP_NAME}" && (echo "Missing required variable AZURE_APP_NAME. See 'Staging.md'"; exit 1)
+        - test -z "${AZURE_RESOURCE_GROUP}" && (echo "Missing required variable DOCKER_AUTH_CONFIG. See 'Staging.md'"; exit 1)        
+        
+        ## Login into azure
+        - az login --service-principal -u "${AZURE_SP_NAME}" -p "${AZURE_SP_CERT}" --tenant "jyu.onmicrosoft.com"
 
-    ## Login into azure
-    - az login --service-principal -u "${AZURE_SP_NAME}" -p "${AZURE_SP_CERT}" --tenant "jyu.onmicrosoft.com"
+    script:
+        ## Create staging slot and copy settings from production
+        - |
+          az webapp deployment slot create -n "$AZURE_APP_NAME" -g "$AZURE_RESOURCE_GROUP" \
+            --slot "$CI_ENVIRONMENT_SLUG" --configuration-source "$AZURE_APP_NAME"
 
-  script:
-    ## Create staging slot and copy settings from production
-    - |
-      az webapp deployment slot create -n "${AZURE_APP_NAME}" -g "${AZURE_RESOURCE_GROUP}" \
-            --slot "${CI_ENVIRONMENT_SLUG}" --configuration-source "${AZURE_APP_NAME}"
+        ## TODO: Create a snapshot of database, and use it.
 
-    ## TODO: Create a snapshot of database, and use it.
+        ## If you need to change settings see: https://docs.microsoft.com/en-us/cli/azure/webapp/config/appsettings
 
-    ## If you need to change settings see: https://docs.microsoft.com/en-us/cli/azure/webapp/config/appsettings
+        ## Change container tag to reflect branch we're running on
+        - |
+          az webapp config container set -n "$AZURE_APP_NAME" -g "$AZURE_RESOURCE_GROUP" \
+            --docker-custom-image-name "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}" -s "$CI_ENVIRONMENT_SLUG"
 
-    ## Change container tag to reflect branch we're running on
-    - |
-      az webapp config container set -n "${AZURE_APP_NAME}" -g "${AZURE_RESOURCE_GROUP}" \
-            --docker-custom-image-name "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}" -s "${CI_ENVIRONMENT_SLUG}"
+        ## In case slot already existed, restart the slot
+        - az webapp restart -n "$AZURE_APP_NAME" -g "$AZURE_RESOURCE_GROUP" -s "$CI_ENVIRONMENT_SLUG"
 
-    ## In case slot already existed, restart the slot
-    - az webapp restart -n "${AZURE_APP_NAME}" -g "${AZURE_RESOURCE_GROUP}" -s "${CI_ENVIRONMENT_SLUG}"
+        ## Restart is not immediate, it takes a sec or two, depending on container changes.
+        - sleep 20
 
-    ## Restart is not immediate, it takes a sec or two, depending on container changes.
-    - sleep 20
+        ## Store server info as artifact for prosperity
+        - curl "$CI_ENVIRONMENT_URL/server-info" -o server-info.json
 
-    ## Store server info as artifact for prosperity
-    - curl "${CI_ENVIRONMENT_URL}/server-info" -o server-info.json
+    artifacts:
+        paths:
+            - server-info.json
 
-  artifacts:
-    paths:
-      - server-info.json
 
 ## Push latest image into registry with the `latest` tag.
 docker tag latest:
   stage: deploy
-
-  environment:
-    name: production
-
+  environment: production
   image: docker:20.10.23
-  only:
-    - main
-  script:
-    ## Copy credentials to container
     - mkdir -p ${HOME}/.docker && echo "${DOCKER_AUTH_CONFIG}" > "${HOME}/.docker/config.json"
     ## Add the `latest` tag to the image we have build.
     - docker buildx imagetools create ${DOCKER_IMAGE_NAME}:${DOCKER_TAG} --tag ${DOCKER_IMAGE_NAME}:latest
 
+
 ## Swap the production and staging slots around.
 staging to production:
-  stage: deploy
-  ## Only run this stage when main branch receives changes.
-  only:
-    - main
+    stage: deploy
+    ## Only run this stage when main branch receives changes.
+    only:
+        - main
 
-  ## Use microsoft provided azure cli image, that contains az cli.
-  image: mcr.microsoft.com/azure-cli
+    ## Use microsoft provided azure cli image, that contains az cli.
+    image: mcr.microsoft.com/azure-cli
 
-  environment:
-    name: production
-    url: https://${AZURE_APP_NAME}.azurewebsites.net/
+    environment:
+        name: production
+        url: https://${AZURE_APP_NAME}.azurewebsites.net/
 
-  before_script:
-    ## Login into azure
-    - az login --service-principal -u "${AZURE_SP_NAME}" -p "${AZURE_SP_CERT}" --tenant "jyu.onmicrosoft.com"
+    before_script:
+        ## Login into azure
+        - az login --service-principal -u "${AZURE_SP_NAME}" -p "${AZURE_SP_CERT}" --tenant "jyu.onmicrosoft.com"
 
-  script:
-    ## Swap production and staging slots.
-    - az webapp deployment slot swap -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_APP_NAME" -s staging --target-slot production
+    script:
+        ## Swap production and staging slots.
+        - az webapp deployment slot swap -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_APP_NAME" -s staging --target-slot production

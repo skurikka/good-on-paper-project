@@ -6,11 +6,13 @@ from mongoengine import (
     DateTimeField,
     EmailField,
     BooleanField,
+    EnumField,
 )
 
 from flask_login import UserMixin
 from bson import ObjectId
 
+from .i18n import SupportedLocales
 
 from .db import db    
 class User(UserMixin, db.Document):
@@ -24,6 +26,8 @@ class User(UserMixin, db.Document):
     password = StringField(required=True)
     birthday = DateTimeField(required=True)
     created_at = DateTimeField(required=True, default=datetime.utcnow)
+    currency = StringField(max_length=3)
+    locale = EnumField(SupportedLocales)
 
     is_disabled = BooleanField(default=False)
     "Whether the user is disabled."
@@ -64,4 +68,38 @@ class Item(db.Document):
     seller = ReferenceField(User, required=True)
     created_at = DateTimeField(required=True, default=datetime.utcnow)
     closes_at = DateTimeField()
+
+    @property
+    def is_open(self) -> bool:
+        """
+        Return whether the item is open for bidding.
+        """
+        return self.closes_at > datetime.utcnow()
+
+    @property
+    def get_excerpt(self):
+        if len(self.description) < 50:
+            excerpt = self.description
+        else:
+            excerpt = self.description[ 0 : 50 ] + '...'
+        
+        return excerpt
+
+class Bid(db.Document):
+    """
+    A model for bids on items.
+    """
+
+    amount = IntField(required=True, min_value=0)
+    "Indicates the value of the bid."
+
+    bidder = ReferenceField(User, required=True)
+    "User who placed the bid."
+
+    item = ReferenceField(Item, required=True)
+    "Item that the bid is for."
+
+    created_at = DateTimeField(required=True, default=datetime.utcnow)
+    "Date and time that the bid was placed."
+
     

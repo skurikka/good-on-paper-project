@@ -1,51 +1,53 @@
 {% extends 'base.html' %}
 
-{% block header %}
-<h1>{% block title %}Items{% endblock %}</h1>
-{% if current_user %}
-<a class="btn" id="new-button" href="{{ url_for('items.sell') }}">New item</a>
-{% endif %}
-{% endblock %}
 
 {% block content %}
+<div>
+  {% if not current_user.is_authenticated %}
+    <p>{{ _("Get started by logging in or registering.") }}</p>
+    <div class="mt-4">
+      <a class="btn btn-primary" href="{{ url_for('auth.login') }}">{{ _("Log in") }}</a>
+      <a class="btn btn-primary" href="{{ url_for('auth.register') }}">{{ _("Register") }}</a>
+    </div>
+    <figure>
+        <img src="{{ url_for('static', filename='images/front-small.png') }}"/>
+    </figure>
+  {% else %}
+    <p>{{ _("Add new item for auction.") }}</p>
+    <a class="btn btn-primary inline-block mt-4" href="{{ url_for('items.sell') }}">{{ _("New item") }}</a>
+  {% endif %}
 
-<div class="container">
-  <table class="table">
-    <thead class="thead-light">
-      <tr>
-        <th></th>
-        <th>Title</th>
-        <th>Starting Bid</th>
-        <th>Seller</th>
-        <th>Closes At</th>
-      </tr>
-    </thead>
-    <tbody>
+  <div class="mt-8">
+    <h2>{% block title %}{{ _("Items") }}{% endblock %}</h2>
+
+    <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-4">
       {% for item in items.items %}
-      <tr>
-        <td>
-          {% if current_user == item.seller %}
-            <a class="action btn btn-primary" href="{{ url_for('items.update', id=item['id']) }}">Edit</a>
-          {% endif %}
-        </td>
-        <td>{{ item.title }}</td>
-        <td>{{ item.starting_bid }}</td>
-        <td>{{ item.seller.email }}</td>
-        <td>{{ item.closes_at }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <nav  class="pagination" aria-label="Page navigation">
-    <ul>
-      {% for page in items.iter_pages() %}
-      <li class="page-item {% if page == items.page %}active{% endif %}">
-        <a class="page-link" href="{{ url_for('items.index', page=page) }}">{{ page }}</a>
+      <li class="bg-white drop-shadow-lg rounded-[15px] overflow-hidden text-left relative">
+        {% if current_user == item.seller %}
+          <a class="absolute top-0 left-0 btn-card" href="{{ url_for('items.update', id=item['id']) }}">{{ _("Edit") }}</a>
+        {% endif %}
+        <figure class="aspect-video overflow-hidden m-0">
+          <img src="https://via.placeholder.com/400x300" class="w-full h-full object-cover" alt="...">
+        </figure>
+        <div class="p-4">
+          <h5 class=""><a href="{{ url_for('items.view', id=item.id)}}">{{ item.title }}</a></h5>
+          <p class=""><span>{{ _("Starting bid:") }}</span> {{ item.starting_bid|localcurrency }}</p>
+          <p class=""><span>{{ _("Closes at:") }}</span> {{ item.closes_at.strftime("%d.%m.%y %H:%M") }}</p>
+          <p class=""><span>{{ _("Seller:") }}</span> {{ item.seller.email }}</p>
       </li>
       {% endfor %}
     </ul>
-  </nav>
-</div>
 
+    <nav  class="pagination" aria-label="Page navigation">
+      <ul>
+        {% for page in items.iter_pages() %}
+        <li class="page-item {% if page == items.page %}active{% endif %}">
+          <a class="page-link" href="{{ url_for('items.index', page=page) }}">{{ page }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</div>
 
 {% endblock %}

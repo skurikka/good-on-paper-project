@@ -15,9 +15,19 @@ FROM mcr.microsoft.com/vscode/devcontainers/python:3.10-bullseye
 ## Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
+## Make container more secure by using Finnish locale
+ENV LANG=fi_FI.UTF-8
+ENV LC_ALL=${LANG}
+
+RUN echo "${LANG} UTF-8" >> /etc/locale.gen && \
+    locale-gen && \
+    dpkg-reconfigure --frontend=noninteractive locales
+
 ## Set static working directory. By default, it is set to /workspaces/<project-name> by
 ## vscode.
 WORKDIR /app
+
+
 
 ## Declare default flask app as environment variable
 ## https://flask.palletsprojects.com/en/2.2.x/cli/
@@ -58,6 +68,9 @@ RUN pip --disable-pip-version-check install -v -e .
 ARG CI_COMMIT_SHA
 ENV CI_COMMIT_SHA=${CI_COMMIT_SHA}
 
+## Download the currency rates from European Central Bank
+RUN flask update-currency-rates
+
 ## Save build date and time
 RUN echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> /app/.env
 
@@ -68,6 +81,8 @@ ARG USERNAME=vscode
 RUN test ! -z "${USERNAME}" && mkdir -p /home/${USERNAME}/.vscode-server/extensions && \
     chown -R $USERNAME /home/$USERNAME/.vscode-server
 
+#Compile translations
+RUN pybabel compile -f -d src/tjts5901/translations/
 ## [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>

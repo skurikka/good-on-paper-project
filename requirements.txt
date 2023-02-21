@@ -5,9 +5,13 @@ importlib-metadata
 flask
 python-dotenv
 flask-login
+flask-babel
 passlib
 flask-mongoengine
 python-dateutil
+pyIsEmail
+email-validator
+CurrencyConverter
 
 # Git hooks
 pre-commit

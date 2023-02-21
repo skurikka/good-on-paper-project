@@ -4,7 +4,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from flask import (
-    Blueprint, flash, redirect, render_template, request, session, url_for
+    Blueprint, flash, redirect, render_template, request, session, url_for, abort
 )
 
 from flask_login import (
@@ -22,7 +22,10 @@ from mongoengine import DoesNotExist
 
 from passlib.hash import pbkdf2_sha256
 
-from .models import User
+from pyisemail import is_email
+from email_validator import validate_email, EmailNotValidError
+
+from .models import User, Item
 
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -73,8 +76,19 @@ def register():
         terms = request.form.get('terms', False)
 
         error = None
+        bool_result_with_dns = is_email(email, check_dns=True)
+        is_new_account = True # False for login pages
+
+        try:
+            validation = validate_email(email, check_deliverability=is_new_account)
+            email = validation.email
+        except EmailNotValidError as error_message:
+            error = str(error_message)
+
         special_characters = '!@#$%&()-_[]{};:"./<>?'
 
+        if not bool_result_with_dns:
+            error = 'E-mail is not valid'
         if not email:
             error = 'Email is required.'
         elif not password:
@@ -142,6 +156,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         error = None
+        user = None
         print("requested email:", email)
         print("requested password:", password)
         try:
@@ -186,3 +201,22 @@ def logout():
     logout_user()
     flash("You have been logged out.", 'success')
     return redirect(url_for('auth.login'))
+
+@bp.route('/profile/<email>')
+@login_required
+def profile(email):
+    """
+    Show the user's profile page for the given email.
+
+    If the email is 'me', then the current user's profile is shown.
+    """
+    if email == 'me':
+        email = current_user.email
+
+    user: User = User.objects.get_or_404(email=email)
+
+    # List the items user has created
+    items = Item.objects(seller=user).order_by('-created_at') .all()
+
+    return render_template('auth/profile.html', user=user, items=items)
+

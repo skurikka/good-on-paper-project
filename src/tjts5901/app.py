@@ -11,6 +11,7 @@ import logging
 from os import environ
 from typing import Dict, Optional
 from datetime import date
+from flask_babel import _
 
 from dotenv import load_dotenv
 from flask import (
@@ -22,6 +23,7 @@ from flask import (
 
 from .utils import get_version
 from .db import init_db
+from .i18n import init_babel
 
 
 def create_app(config: Optional[Dict] = None) -> Flask:
@@ -34,7 +36,7 @@ def create_app(config: Optional[Dict] = None) -> Flask:
 
     flask_app.config.from_mapping(
         SECRET_KEY='dev',
-        BRAND="Good on paper bid",
+        BRAND=_("Good on paper auction"),
         NOW=date.today(),
     )
 
@@ -51,18 +53,29 @@ def create_app(config: Optional[Dict] = None) -> Flask:
     # Set flask config variable for "rich" loggin from environment variable.
     flask_app.config.from_envvar("RICH_LOGGING", silent=True)
 
-    init_logging(flask_app)
-
     # Init db connection
     init_db(flask_app)
+    
+    @flask_app.route('/debug-sentry')
+    def trigger_error():
+        division_by_zero = 1 / 0
 
     from .auth import init_auth
     init_auth(flask_app)
 
+    from .currency import init_currency
+    init_currency(flask_app)
+    
 
     from . import items
     flask_app.register_blueprint(items.bp)
     flask_app.add_url_rule('/', endpoint='index')
+
+    init_babel(flask_app)
+        # a simple page that says hello
+    @flask_app.route('/hello')
+    def hello():
+        return _('Hello, World!')
 
 
     return flask_app
