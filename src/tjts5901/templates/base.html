@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{get_locale()}}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,20 +12,29 @@
     <header class="header-section relative z-50">
         <div class="container px-4">
             <nav id="main-navigation">
+                <li class="nav-item">
+                    <div class="dropdown">
+                        <div class="dropdown-menu" aria-labelledby="languageDropdown">
+                          {% for _, lang in locales.items() %}
+                            <a class="dropdown-item {% if lang|lower == get_locale()|lower %}active{% endif %}" href="{{ url_for(request.endpoint, **dict(request.view_args, locale=lang)) }}">{{lang.display_name}}</a>
+                          {% endfor %}
+                        </div>
+                      </div>
+                  </li>        
                 <a href="{{ url_for('items.index') }}">
                     <img src="{{ url_for('static', filename='images/logoipsum-221.svg') }}">
                 </a>
                 <ul>
                     <li>
-                    <a href="{{ url_for('items.index') }}">Home</a>
+                    <a href="{{ url_for('items.index') }}">{{ _("Home") }}</a>
                     </li>
                     {% if current_user.is_authenticated %}
                         <li><a href="{{ url_for('auth.profile', email='me') }}">{{ current_user['email'] }}</a></li>
-                        <li><a href="{{ url_for('items.sell') }}">Sell</a></li>
-                        <li><a class="text-red" href="{{ url_for('auth.logout') }}">Log Out</a>
+                        <li><a href="{{ url_for('items.sell') }}">{{ _("Sell") }}</a></li>
+                        <li><a class="text-red" href="{{ url_for('auth.logout') }}">{{ _("Log Out") }}</a>
                     {% else %}
-                        <li><a href="{{ url_for('auth.login') }}">Sell</a></li>
-                        <li><a href="{{ url_for('auth.login') }}">Log In</a>
+                        <li><a href="{{ url_for('auth.login') }}">{{ _("Sell") }}</a></li>
+                        <li><a href="{{ url_for('auth.login') }}">{{ _("Log In") }}</a>
                     {% endif %}
                 </ul>
             </nav>

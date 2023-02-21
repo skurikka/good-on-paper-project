@@ -2,28 +2,27 @@
 
 {% block header %}
     <div>
-        <h1>{% block title %}{{user.email}}'s Profile Page{% endblock %}</h1>
+        <h1>{% block title %}{{user.email}} {{ _("Profile Page") }} {% endblock %}</h1>
     </div>
 {% endblock %}
 
 {% block content %}
 
 <div class="flex flex-col items-start py-8">
-    <h2 class="text-3xl">User details</h2>
-    <p><span class="font-bold">Email:</span><span>{{ user.email }}</span></p>
-    <p><span class="font-bold">Phone:</span><span>...</span></p>
-</div>
+    <h2 class="text-3xl">{{ _("User details") }}</h2>
+    <p><span class="font-bold">{{ _("Email:") }}</span><span>{{ user.email }}</span></p>
+    <p><span class="font-bold">{{ _("Phone:") }}</span><span>...</span></p>
 
 <div class="auction-section">
-    <h2 class="text-3xl">Recent Auctions</h2>
+    <h2 class="text-3xl">{{ _("Recent Auctions") }}</h2>
     <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-4">
         {% for auction in items %}
         <li class="relative bg-white drop-shadow-lg rounded-[15px] overflow-hidden text-left">
             {% if auction.is_open %}
                 {% if current_user == auction.seller %}
-                    <a href="{{ url_for('items.update', id=auction.id) }}" class="absolute top-0 left-0 btn-card">Update</a>
+                    <a href="{{ url_for('items.update', id=auction.id) }}" class="absolute top-0 left-0 btn-card">{{ _("Update") }}</a>
                 {% else %}
-                    <a href="{{ url_for('items.bid', id=auction.id) }}" class="absolute top-0 left-0 btn-card">Place a bid</a>
+                    <a href="{{ url_for('items.bid', id=auction.id) }}" class="absolute top-0 left-0 btn-card">{{ _("Place a bid") }}</a>
                 {% endif %}
             {% endif %}
             <figure class="aspect-video overflow-hidden m-0">
@@ -32,10 +31,10 @@
             <div class="p-4">
                 <h5 class=""><a href="{{ url_for('items.view', id=auction.id)}}">{{ auction.title }}</a></h5>
                 <p class="">{{ auction.get_excerpt }}</p>
-                <p class=""><span class="font-bold">Starting Bid: </span>{{ auction.starting_bid }}&euro;</p>
+                <p class=""><span class="font-bold">{{ _("Starting Bid:") }} </span>{{ auction.starting_bid|localcurrency }}</p>
                 <div class="pt-4">
                     {% if not auction.is_open %}
-                        <p class="text-red font-bold">Auction is closed</p>
+                        <p class="text-red font-bold">{{ _("Auction is closed") }}</p>
                     {% endif %}
                 </div>
             </li>

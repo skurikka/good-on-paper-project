@@ -6,11 +6,13 @@ from mongoengine import (
     DateTimeField,
     EmailField,
     BooleanField,
+    EnumField,
 )
 
 from flask_login import UserMixin
 from bson import ObjectId
 
+from .i18n import SupportedLocales
 
 from .db import db    
 class User(UserMixin, db.Document):
@@ -24,6 +26,8 @@ class User(UserMixin, db.Document):
     password = StringField(required=True)
     birthday = DateTimeField(required=True)
     created_at = DateTimeField(required=True, default=datetime.utcnow)
+    currency = StringField(max_length=3)
+    locale = EnumField(SupportedLocales)
 
     is_disabled = BooleanField(default=False)
     "Whether the user is disabled."
