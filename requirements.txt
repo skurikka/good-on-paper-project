@@ -11,6 +11,7 @@ flask-mongoengine
 python-dateutil
 pyIsEmail
 email-validator
+Flask-Babel
 CurrencyConverter
 
 # Git hooks

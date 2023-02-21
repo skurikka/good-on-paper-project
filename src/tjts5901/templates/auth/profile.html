@@ -8,10 +8,23 @@
 
 {% block content %}
 
-<div class="flex flex-col items-start py-8">
-    <h2 class="text-3xl">{{ _("User details") }}</h2>
-    <p><span class="font-bold">{{ _("Email:") }}</span><span>{{ user.email }}</span></p>
-    <p><span class="font-bold">{{ _("Phone:") }}</span><span>...</span></p>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-8">
+    <div class="md:col-span-2 flex flex-col items-start">
+        <h2 class="text-3xl">{{ _("User details") }}</h2>
+        <p><span class="font-bold">{{ _("Email:") }}</span><span>{{ user.email }}</span></p>
+        <p><span class="font-bold">{{ _("Phone:") }}</span><span>...</span></p>
+    </div>
+
+    <div class="flex flex-col gap-4 items-center">
+
+            <a href="{{ url_for('items.sell') }}" class="btn btn-primary">{{ _("Sell an Item") }}</a>
+            <a href="{{ url_for('auth.user_access_tokens') }}" class="btn btn-primary">{{ _("Tokens") }}</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">{{ _("Logout") }} </a>
+    </div>
+</div>
+
+<hr class="mb-8"/>
+
 
 <div class="auction-section">
     <h2 class="text-3xl">{{ _("Recent Auctions") }}</h2>

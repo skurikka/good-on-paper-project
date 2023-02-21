@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Access tokens{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="my-4">
+    <div class="mb-4">
+        <h2 class="text-xl">{{_("Personal Access Tokens")}}</h2>
+        <p>
+            Personal access tokens allow third-party services to authenticate with our application on your behalf.
+        </p>
+    </div>
+    <div class="w-full">
+        {% if token %}
+        <div class="alert-success my-4 flash-success p-4" role="alert">
+            <h4>{{_("Your new personal access token")}}</h4>
+            <p>
+                Your new personal access token is shown below. You may now use this token to make API requests.
+            </p>
+            <div class="my-4">
+                <input type="text" id="token" value="{{ token.token }}" readonly>
+                <button class="btn btn-secondary" type="button" id="copy-token" onclick="copyToken()">{{_("Copy")}}</button>
+            </div>
+            <small>{{ _("Make sure to copy your new token now. You won't be able to see it again!") }}</small>
+        </div>
+        {% endif %}
+        <div class="w-full flex flex-col items-center">
+            <div>
+                <h2>{{ _("Create access token") }}</h2>
+            </div>
+            <div id="token-form">
+                <form action="{{url_for('auth.user_access_tokens', email='me')}}" method="post">
+                    <div class="flex flex-col mb-4">
+                        <label for="name">{{ _("Name") }}</label>
+                        <input type="text" class="m-0" name="name" id="name" placeholder="{{ _('Enter token name') }}">
+                        <small>{{ _("Give your token a descriptive name so you can easily identify it in the future.") }}</small>
+                    </div>
+                    <div class="flex flex-col mb-4">
+                        <label class="form-check-label" for="expires">{{ _("Expires at") }}</label>
+                        <input type="date" class="m-0" name="expires" id="expires">
+                        <small>{{ _("Leave blank to never expire.") }}</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{ _("Create access token") }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="my-4">
+    <h2>{{ _("Active Access Tokens") }}</h2>
+    <table class="w-full">
+        <thead>
+            <tr>
+                <th>{{ _("Token name") }}</th>
+                <th>{{ _("Created") }}</th>
+                <th>{{ _("Last used") }}</th>
+                <th>{{ _("Expires") }}</th>
+                <th>{{ _("Actions") }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for access_token in tokens %}
+            <tr>
+                <td>{{ access_token.name }}</td>
+                <td>
+                    {{ access_token.created_at.strftime("%d.%m.%y") }}
+                </td>
+                <td>
+                    {% if access_token.last_used_at %}
+                        {{ access_token.last_used_at.strftime("%d.%m.%y %H:%M") }}
+                    {% else %}{{ _("Never") }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if access_token.expires %}
+                        {{ access_token.expires.strftime("%d.%m.%y") }}
+                    {% else %}{{ _("Never") }}
+                    {% endif %}
+                </td>
+                <td>
+                    <form action="{{ url_for('auth.delete_user_access_token', email='me', id=access_token.id) }}"
+                        method="post">
+                        <button type="submit" class="btn btn-danger block mx-auto">{{ _("Delete") }}</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+  
+{% endblock %}

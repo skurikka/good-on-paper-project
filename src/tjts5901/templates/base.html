@@ -12,31 +12,38 @@
     <header class="header-section relative z-50">
         <div class="container px-4">
             <nav id="main-navigation">
-                <li class="nav-item">
-                    <div class="dropdown">
-                        <div class="dropdown-menu" aria-labelledby="languageDropdown">
-                          {% for _, lang in locales.items() %}
-                            <a class="dropdown-item {% if lang|lower == get_locale()|lower %}active{% endif %}" href="{{ url_for(request.endpoint, **dict(request.view_args, locale=lang)) }}">{{lang.display_name}}</a>
-                          {% endfor %}
-                        </div>
-                      </div>
-                  </li>        
-                <a href="{{ url_for('items.index') }}">
-                    <img src="{{ url_for('static', filename='images/logoipsum-221.svg') }}">
-                </a>
-                <ul>
-                    <li>
-                    <a href="{{ url_for('items.index') }}">{{ _("Home") }}</a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                        <li><a href="{{ url_for('auth.profile', email='me') }}">{{ current_user['email'] }}</a></li>
-                        <li><a href="{{ url_for('items.sell') }}">{{ _("Sell") }}</a></li>
-                        <li><a class="text-red" href="{{ url_for('auth.logout') }}">{{ _("Log Out") }}</a>
-                    {% else %}
-                        <li><a href="{{ url_for('auth.login') }}">{{ _("Sell") }}</a></li>
-                        <li><a href="{{ url_for('auth.login') }}">{{ _("Log In") }}</a>
-                    {% endif %}
-                </ul>
+                <div class="flex flex justify-between w-full md:w-fit relative z-20">
+                    <a href="{{ url_for('items.index') }}">
+                        <img src="{{ url_for('static', filename='images/logoipsum-221.svg') }}">
+                    </a>
+                    <button class="inline-block md:hidden btn-language uppercase" onclick="language_mob();">Language <i class="fa-solid fa-caret-down"></i></button>
+                    <ul id="lang-mobile" class="hidden bg-white border-2 border-primary-700 p-4 rounded-[15px] absolute top-8 right-0">
+                        {% for _, lang in locales.items() %}
+                            <li><a class="{% if lang|lower == get_locale()|lower %}active{% endif %}" href="{{ url_for(request.endpoint, **dict(request.view_args, locale=lang)) }}">{{lang.display_name}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="flex flex-col w-fit relative items-end z-10">
+                    <button class="hidden md:inline-block btn-language uppercase" onclick="language();">Language <i class="fa-solid fa-caret-down"></i></button>
+                    <ul id="lang-desktop" class="hidden bg-white border-2 border-primary-700 p-4 rounded-[15px] absolute top-8 right-0">
+                        {% for _, lang in locales.items() %}
+                            <li><a class="{% if lang|lower == get_locale()|lower %}active{% endif %}" href="{{ url_for(request.endpoint, **dict(request.view_args, locale=lang)) }}">{{lang.display_name}}</a></li>
+                        {% endfor %}
+                    </ul>
+                    <ul class="flex justify-center md:justify-end">
+                        <li>
+                        <a href="{{ url_for('items.index') }}">{{ _("Home") }}</a>
+                        </li>
+                        {% if current_user.is_authenticated %}
+                            <li><a href="{{ url_for('auth.profile', email='me') }}">{{ current_user['email'] }}</a></li>
+                            <li><a href="{{ url_for('items.sell') }}">{{ _("Sell") }}</a></li>
+                            <li><a class="text-red" href="{{ url_for('auth.logout') }}">{{ _("Log Out") }}</a>
+                        {% else %}
+                            <li><a href="{{ url_for('auth.login') }}">{{ _("Sell") }}</a></li>
+                            <li><a href="{{ url_for('auth.login') }}">{{ _("Log In") }}</a>
+                        {% endif %}
+                    </ul>
+                </div>
             </nav>
         </div>
     </header>
@@ -73,7 +80,32 @@
     <footer>
         <div class="container px-4">
             {% block footer %}
-                <p class="text-base">Footer</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <a href="{{ url_for('items.index') }}" class="block w-fit h-fit">
+                        <img class="invert mb-6" src="{{ url_for('static', filename='images/logoipsum-221.svg') }}">
+                    </a>
+                    <ul>
+                        <li><a class="text-white no-underline font-normal hover:text-white hover:underline" href="{{ url_for('items.index') }}">{{ _("Home") }}</a></li>
+                        {% if current_user.is_authenticated %}
+                            <li><a class="text-white no-underline font-normal hover:text-white hover:underline" href="{{ url_for('auth.profile', email='me') }}">{{ current_user['email'] }}</a></li>
+                            <li><a class="text-white no-underline font-normal hover:text-white hover:underline" href="{{ url_for('items.sell') }}">{{ _("Sell") }}</a></li>
+                        {% else %}
+                            <li><a class="text-white no-underline font-normal hover:text-white hover:underline" href="{{ url_for('auth.login') }}">{{ _("Sell") }}</a></li>
+                            <li><a class="text-white no-underline font-normal hover:text-white hover:underline" href="{{ url_for('auth.login') }}">{{ _("Log In") }}</a>
+                            <li><a class="text-white no-underline font-normal hover:text-white hover:underline" href="{{ url_for('auth.register') }}">{{ _("Register") }}</a>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="pt-6 md:pt-0">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                </div>
+            </div>
+            <hr class="my-4"/>
+            <div class="flex justify-between">
+                <p>&copy; 2023 {{config['BRAND']}}</p>
+                <a href="#" class="text-white no-underline font-normal hover:text-white hover:font-bold">{{ _("Terms and conditions") }}</a>
+            </div>
             {% endblock %}
         </div>
 

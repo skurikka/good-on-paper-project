@@ -2,6 +2,8 @@ import logging
 
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from flask_babel import _
+
 
 from flask import (
     Blueprint, flash, redirect, render_template, request, session, url_for, abort
@@ -19,13 +21,14 @@ from sentry_sdk import set_user
 
 
 from mongoengine import DoesNotExist
+from mongoengine.queryset.visitor import Q
 
 from passlib.hash import pbkdf2_sha256
 
 from pyisemail import is_email
 from email_validator import validate_email, EmailNotValidError
 
-from .models import User, Item
+from .models import AccessToken, User, Item
 
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -42,10 +45,42 @@ def init_auth(app):
     login_manager.login_view = 'auth.login'
     login_manager.user_loader(load_logged_in_user)
 
+    app.config['AUTH_HEADER_NAME'] = 'Authorization'
+    login_manager.request_loader(load_user_from_request)
+
     login_manager.init_app(app)
 
     logger.debug("Initialized authentication")
 
+def load_user_from_request(request):
+    """
+    Load a user from the request.
+
+    This function is used by Flask-Login to load a user from the request.
+    """
+    api_key = request.headers.get("Authorization")
+
+    if api_key:
+        api_key = api_key.replace("Bearer ", "", 1)
+        try:
+            token = AccessToken.objects.get(token=api_key)
+            if token.expires and token.expires < datetime.utcnow():
+                logger.warning("Token expired: %s", api_key)
+                return None
+            # User is authenticated
+
+            token.last_used_at = datetime.utcnow()
+            token.save()
+            logger.debug("User authenticated via token: %r", token.user.email, extra={
+                "user": token.user.email,
+                "user_id": str(token.user.id),
+                "token": token.token,
+            })
+            return token.user
+        except DoesNotExist:
+            logger.error("Token not found: %s", api_key)
+
+    return None
 
 def load_logged_in_user(user_id):
     """
@@ -60,6 +95,30 @@ def load_logged_in_user(user_id):
         return None
 
     return user
+
+def get_user_by_email(email: str) -> User:
+    """
+    Get a user from the database, given the user's email.
+
+    If the email is 'me', then the current user is returned.
+
+    :param email: The email of the user to get.
+    """
+
+    if email is None:
+        abort(404)
+
+    if email == "me" and current_user.is_authenticated:
+        email = current_user.email
+
+    try:
+        user = User.objects.get_or_404(email=email)
+    except DoesNotExist:
+        logger.error("User not found: %s", email)
+        abort(404)
+
+    return user
+
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
@@ -220,3 +279,63 @@ def profile(email):
 
     return render_template('auth/profile.html', user=user, items=items)
 
+@bp.route('/profile/<email>/token', methods=('GET', 'POST'), defaults={'email': 'me'})
+@login_required
+def user_access_tokens(email):
+    """
+    Show the user's tokens page for the given email.
+    """
+
+    user: User = get_user_by_email(email)
+     # Fetch all the user tokens that are active or have no expire date
+    tokens = AccessToken.objects(Q(expires__gte=datetime.now()) | Q(expires=None), user=user).all()
+
+    token = None
+    if request.method == 'POST':
+        try:
+            name = request.form['name']
+
+            if expires := request.form.get('expires'):
+                expires = datetime.fromisoformat(expires)
+            else:
+                expires = None
+
+
+            token = AccessToken(
+                user=user,
+                name=name,
+                expires=expires,
+            )
+            token.save()
+        except KeyError as exc:
+            logger.debug("Missing required field: %s", exc)
+            flash(_("Required field missing"), 'error')
+        except Exception as exc:
+            logger.exception("Error creating token: %s", exc)
+            flash(_("Error creating token: %s") % exc, 'error')
+        else:
+            flash(_("Created token: %s") % token.name, 'success')
+
+    return render_template('auth/tokens.html', user=user, tokens=tokens, token=token)
+
+
+@bp.route('/profile/<email>/token/<id>', methods=('POST',))
+def delete_user_access_token(email, id):
+    """
+    Delete an access token.
+    """
+    user = get_user_by_email(email)
+    token = AccessToken.objects.get_or_404(id=id)
+
+    if token.user != user:
+        logger.warning("User %s tried to delete token %s", user.email, token.name, extra={
+            "user": user.email,
+            "token": str(token.id),
+            "token_user": token.user.email,
+        })
+        abort(403)
+
+    token.delete()
+
+    flash(f"Deleted token {token.name}")
+    return redirect(url_for('auth.user_access_tokens'))

@@ -1,6 +1,6 @@
 import logging
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify
 )
 from flask_babel import _, get_locale
 from werkzeug.exceptions import abort
@@ -31,6 +31,7 @@ from flask_login import (
 )
 
 bp = Blueprint('items', __name__)
+api = Blueprint('api_items', __name__, url_prefix='/api/items')
 
 logger = logging.getLogger(__name__)
 
@@ -117,8 +118,6 @@ def sell():
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
-        ##starting_bid = int(request.form['starting_bid'])
-        
         currency = request.form.get('currency', REF_CURRENCY)
         starting_bid = convert_from_currency(request.form['starting_bid'], currency)        
         error = None
@@ -152,8 +151,6 @@ def sell():
             else:
                 return redirect(url_for('items.index'))
 
-            #print(error)
-            #flash(error, 'error')
         print(error)
         flash(error, category='error')
 
@@ -163,8 +160,8 @@ def sell():
     for currency in get_currencies():
         currencies[currency] = names.get(currency, currency)
 
-    #return render_template('items/sell.html')
     return render_template('items/sell.html', currencies=currencies, default_currency=get_preferred_currency())
+
 @bp.route('/item/<id>')
 def view(id):
     """
@@ -185,15 +182,14 @@ def view(id):
     if item.closes_at < datetime.utcnow() and winning_bid.bidder == current_user:
         flash("Congratulations! You won the auction!")
     elif item.closes_at < datetime.utcnow() + timedelta(hours=1):
-        # Dark pattern to show enticing message to user
-
         flash("This item is closing soon! Act now! Now! Now!")
 
-    return render_template('items/view.html',
+    return render_template('items/view.html', id=id,
                            item=item, min_bid=min_bid,
                            local_min_bid=local_min_bid,
                            local_currency=local_currency,
-                           winning_bid=winning_bid)
+                           winning_bid=winning_bid,
+                           bid_history=bid_history)
 
 
 
@@ -255,7 +251,6 @@ def bid(id):
 
     item = Item.objects.get_or_404(id=id)
     min_amount = get_item_price(item)
-    #amount = int(request.form['amount'])
     local_amount = request.form['amount']
     currency = request.form.get('currency', REF_CURRENCY)
 
@@ -263,16 +258,14 @@ def bid(id):
 
     if amount < min_amount:
         #flash(f"Bid must be at least {min_amount}")
-        flash(_("Bid must be at least %(min_amount)s", min_amount=format_converted_currency(min_amount)))        
+        flash(_("Bid must be at least %(min_amount)s", min_amount=format_converted_currency(min_amount)), 'error')
         return redirect(url_for('items.view', id=id))
 
     if item.closes_at < datetime.utcnow():
-        flash("This item is no longer on sale.")
+        flash("This item is no longer on sale.", 'error')
         return redirect(url_for('items.view', id=id))
 
     try:
-        # Notice: if you have integrated the flask-login extension, use current_user
-        # instead of g.user
         bid = Bid(
             item=item,
             bidder=current_user,
@@ -285,3 +278,98 @@ def bid(id):
         flash("Bid placed successfully!", 'success')
 
     return redirect(url_for('items.view', id=id))
+
+
+# API ---------------------------------------------------------------------------------------------
+
+@api.route('<id>/bids', methods=('GET',))
+@login_required
+def api_item_bids(id):
+    """
+    Get the bids for an item.
+
+    :param id: The id of the item to get bids for.
+    :return: A JSON response containing the bids.
+    """
+
+    item = Item.objects.get_or_404(id=id)
+    bids = []
+    for bid in Bid.objects(item=item).order_by('-amount'):
+        bids.append(bid.to_json())
+
+    return jsonify({
+        'success': True,
+        'bids': bids
+    })
+
+@api.route('<id>/bids', methods=('POST',))
+@login_required
+def api_item_place_bid(id):
+    """
+    Place a bid on an item.
+
+    If the bid is valid, create a new bid and return the bid.
+    Otherwise, return an error message.
+    
+    Only accepts `REF_CURRENCY` bids.
+
+    :param id: The id of the item to bid on.
+    :return: A JSON response containing the bid.
+    """
+
+    item = Item.objects.get_or_404(id=id)
+    min_amount = get_item_price(item)
+
+    try:
+        amount = int(request.form['amount'])
+    except KeyError:
+        return jsonify({
+            'success': False,
+            'error': _("Missing required argument %s" % ('amount'))
+        })
+    except ValueError:
+        return jsonify({
+            'success': False,
+            'error': _("Invalid value for argument %s" % ('amount'))
+        })
+    except Exception as exc:
+        return jsonify({
+            'success': False,
+            'error': _("Error parsing argument %s: %s" % ('amount', exc))
+        })
+
+    if amount < min_amount:
+        return jsonify({
+            'success': False,
+            'error': _("Bid must be at least %s" % (min_amount))
+        })
+
+    if item.closes_at < datetime.utcnow():
+        return jsonify({
+            'success': False,
+            'error': _("This item is no longer on sale.")
+        })
+
+    try:
+        bid = Bid(
+            item=item,
+            bidder=current_user,
+            amount=amount,
+        )
+        bid.save()
+    except Exception as exc:
+        logger.error("Error placing bid: %s", exc, exc_info=True, extra={
+            'item_id': item.id,
+            'bidder_id': current_user.id,
+            'amount': amount,
+        })
+
+        return jsonify({
+            'success': False,
+            'error': _("Error placing bid: %(exc)s", exc=exc)
+        })
+
+    return jsonify({
+        'success': True,
+        'bid': bid
+    })
