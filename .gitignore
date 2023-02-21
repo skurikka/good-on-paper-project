@@ -166,3 +166,6 @@ _docs/
 .env
 .DS_Store
 dotenv
+
+# Ignore certificates
+azure-sp.pem
