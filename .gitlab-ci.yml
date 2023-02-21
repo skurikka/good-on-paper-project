@@ -75,8 +75,8 @@ deploy to staging:
   script:
     ## Create staging slot and copy settings from production
     - |
-      az webapp deployment slot create -n "$AZURE_APP_NAME" -g "$AZURE_RESOURCE_GROUP" \
-            --slot "$CI_ENVIRONMENT_SLUG" --configuration-source "$AZURE_APP_NAME"
+      az webapp deployment slot create -n "${AZURE_APP_NAME}" -g "${AZURE_RESOURCE_GROUP}" \
+            --slot "${CI_ENVIRONMENT_SLUG}" --configuration-source "${AZURE_APP_NAME}"
 
     ## TODO: Create a snapshot of database, and use it.
 
@@ -84,17 +84,17 @@ deploy to staging:
 
     ## Change container tag to reflect branch we're running on
     - |
-      az webapp config container set -n "$AZURE_APP_NAME" -g "$AZURE_RESOURCE_GROUP" \
-            --docker-custom-image-name "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}" -s "$CI_ENVIRONMENT_SLUG"
+      az webapp config container set -n "${AZURE_APP_NAME}" -g "${AZURE_RESOURCE_GROUP}" \
+            --docker-custom-image-name "${DOCKER_IMAGE_NAME}:${DOCKER_TAG}" -s "${CI_ENVIRONMENT_SLUG}"
 
     ## In case slot already existed, restart the slot
-    - az webapp restart -n "$AZURE_APP_NAME" -g "$AZURE_RESOURCE_GROUP" -s "$CI_ENVIRONMENT_SLUG"
+    - az webapp restart -n "${AZURE_APP_NAME}" -g "${AZURE_RESOURCE_GROUP}" -s "${CI_ENVIRONMENT_SLUG}"
 
     ## Restart is not immediate, it takes a sec or two, depending on container changes.
     - sleep 20
 
     ## Store server info as artifact for prosperity
-    - curl "$CI_ENVIRONMENT_URL/server-info" -o server-info.json
+    - curl "${CI_ENVIRONMENT_URL}/server-info" -o server-info.json
 
   artifacts:
     paths:
