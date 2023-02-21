@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-02-21 11:23+0000\n"
+"POT-Creation-Date: 2023-02-21 17:35+0000\n"
 "PO-Revision-Date: 2023-02-21 11:24+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fi_FI\n"
@@ -37,21 +37,26 @@ msgstr "Virhe tehdessä listausta: %(exc)"
 msgid "Bid must be at least %(min_amount)s"
 msgstr "Huudon täytyy olla vähintään %(min_amount)"
 
-#: src/tjts5901/templates/base.html:19
+#: src/tjts5901/templates/base.html:29
 msgid "Home"
 msgstr "Koti"
 
-#: src/tjts5901/templates/base.html:23 src/tjts5901/templates/base.html:26
+#: src/tjts5901/templates/base.html:33 src/tjts5901/templates/base.html:36
 msgid "Sell"
 msgstr "Myy"
 
-#: src/tjts5901/templates/base.html:24
+#: src/tjts5901/templates/base.html:34
 msgid "Log Out"
 msgstr "Kirjaudu ulos"
 
-#: src/tjts5901/templates/auth/login.html:4 src/tjts5901/templates/base.html:27
+#: src/tjts5901/templates/auth/login.html:4 src/tjts5901/templates/base.html:37
 msgid "Log In"
 msgstr "Kirjaudu sisään"
+
+#: src/tjts5901/templates/hello.html:1 tests/test_i18n.py:74
+#: tests/test_i18n.py:98
+msgid "Hello, World!"
+msgstr "Moikka Maailma!"
 
 #: src/tjts5901/templates/auth/login.html:9
 msgid "Don't have an account? Register in"
@@ -82,28 +87,24 @@ msgstr "Email:"
 msgid "Phone:"
 msgstr "Puhelinnumero:"
 
-#: src/tjts5901/templates/auth/profile.html:15
-msgid "Region:"
-msgstr "Alue:"
-
-#: src/tjts5901/templates/auth/profile.html:18
+#: src/tjts5901/templates/auth/profile.html:17
 msgid "Recent Auctions"
 msgstr "Viimeisimmät kaupat"
 
-#: src/tjts5901/templates/auth/profile.html:24
+#: src/tjts5901/templates/auth/profile.html:23
 msgid "Update"
 msgstr "Päivitä"
 
-#: src/tjts5901/templates/auth/profile.html:26
+#: src/tjts5901/templates/auth/profile.html:25
 #: src/tjts5901/templates/items/view.html:19
 msgid "Place a bid"
 msgstr "Huuda"
 
-#: src/tjts5901/templates/auth/profile.html:35
+#: src/tjts5901/templates/auth/profile.html:34
 msgid "Starting Bid:"
 msgstr "Aloitushuuto:"
 
-#: src/tjts5901/templates/auth/profile.html:38
+#: src/tjts5901/templates/auth/profile.html:37
 msgid "Auction is closed"
 msgstr "Kauppa on sulkeutunut"
 
@@ -182,6 +183,10 @@ msgstr "Myy tavara"
 #: src/tjts5901/templates/items/sell.html:8
 msgid "Fill in the details"
 msgstr "Täytä tiedot"
+
+#: src/tjts5901/templates/items/sell.html:11
+msgid "Title"
+msgstr ""
 
 #: src/tjts5901/templates/items/sell.html:13
 #: src/tjts5901/templates/items/update.html:15
@@ -272,4 +277,7 @@ msgstr "Ota yhteyttä myyjään"
 #: src/tjts5901/templates/items/view.html:73
 msgid "Call seller"
 msgstr "Soita myyjälle"
+
+#~ msgid "Region:"
+#~ msgstr "Alue:"
 

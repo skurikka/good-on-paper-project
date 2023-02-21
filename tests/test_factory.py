@@ -8,6 +8,5 @@ def test_config():
 
 
 def test_hello(client):
-    response = client.get('/hello')
     response = client.get('/hello', headers={'Accept-Language': 'en_US'})
     assert response.data == b'Hello, World!'

@@ -72,6 +72,11 @@ def create_app(config: Optional[Dict] = None) -> Flask:
     flask_app.add_url_rule('/', endpoint='index')
 
     init_babel(flask_app)
+        # a simple page that says hello
+    @flask_app.route('/hello')
+    def hello():
+        return _('Hello, World!')
+
 
     return flask_app
 

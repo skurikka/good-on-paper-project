@@ -35,9 +35,11 @@ class SupportedLocales(Enum):
 
     EN = "en_GB.UTF-8"
     "English (United Kingdom)"
+    
 
-    # EN_US = "en_US.UTF-8"
-    # "English (United States)"
+
+    EN_US = "en_US"
+    "English (United States)"
 
 
 
