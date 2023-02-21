@@ -27,7 +27,7 @@ class SupportedLocales(Enum):
     specify a preferred locale.
     """
 
-    FI = "fi_FI.UTF-8"
+    FI = "fi_FI"
     "Finnish (Finland)"
 
   #  SV = "sv_SE.UTF-8"
@@ -38,7 +38,7 @@ class SupportedLocales(Enum):
     
 
 
-    EN_US = "en_US"
+    EN_US = "en_US.UTF-8"
     "English (United States)"
 
 
@@ -129,10 +129,12 @@ def get_locale():
 
     # Get the best match for the Accept-Language header.
     locale = request.accept_languages.best_match(locales_to_try)
+    if locale is None:
+        locale = "en_GB"
+        
 
     logger.debug("Best match for Accept-Language header (%s) is %s.",
                  request.accept_languages, locale)
-
     return locale
 
 

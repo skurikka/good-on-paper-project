@@ -71,7 +71,7 @@ def test_babel_translations(app: Flask, babel: Babel):
                 continue
 
             with force_locale(locale):
-                assert gettext("Hello, World!") != "Hello, World!", f"Message is not translated for language {locale.language}"
+                assert gettext("New item") != "New item", f"Message is not translated for language {locale.language}"
 
 
 def test_app_language_detection(client, babel):
@@ -93,7 +93,7 @@ def test_app_language_detection(client, babel):
             # By default everything should be in english
             continue
 
-        response = client.get('/hello', headers={'Accept-Language': locale.language})
+        response = client.get('/', headers={'Accept-Language': locale.language})
         resp_as_string = response.data.decode('utf-8')
-        assert gettext("Hello, World!") != resp_as_string, f"Message is not translated for language {locale.language}"
+        assert gettext("Myy") != resp_as_string, f"Message is not translated for language {locale.language}"
 

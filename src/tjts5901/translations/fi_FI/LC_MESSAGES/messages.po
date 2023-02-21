@@ -186,7 +186,7 @@ msgstr "Täytä tiedot"
 
 #: src/tjts5901/templates/items/sell.html:11
 msgid "Title"
-msgstr ""
+msgstr "Otsikko"
 
 #: src/tjts5901/templates/items/sell.html:13
 #: src/tjts5901/templates/items/update.html:15
