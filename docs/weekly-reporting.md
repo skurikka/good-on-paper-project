@@ -85,8 +85,12 @@ Added basic functionality for mongodb
 ### Week 3
 
 ### Week 4
+Finished setting up logging. Opened account at sentry.io and listed our project there
 
 ### Week 5
+Added support for currency conversion and localization. Users can now choose between finnish and english language.
+Added finnish translation of the website. 
+Wrote tests for all of these functionalities and made sure they work.
 
 
 -------------------------------
