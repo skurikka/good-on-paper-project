@@ -6,11 +6,11 @@
 
 {% block content %}
   <div id="login">
-    <p>{{ _("Don't have an account? Register in") }} <a href="{{ url_for('auth.register') }}">here</a>.</p>
+    <p>{{ _("Don't have an account? Register in") }} <a href="{{ url_for('auth.register') }}">{{ _("here") }}</a>.</p>
     <form method="post">
       <label for="email">{{ _("Email") }}</label>
       <input name="email" id="email" required>
-      <label for="password">Password</label>
+      <label for="password">{{ _("Password") }}</label>
       <input type="password" name="password" id="password" required>
       <label class="remember"><input name="remember-me" class="form-check-input" type="checkbox">{{ _("Remember me") }}</label>
       <input type="submit" value="Log In" class="btn btn-primary">

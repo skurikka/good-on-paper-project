@@ -9,21 +9,47 @@
 
 {% block content %}
 <div class="grid grid-cols-1 md:grid-cols-3 gap-y-8 gap-x-8 md:gap-y-0 mt-8">
+    <div class="md:col-span-2">
+        <figure class="aspect-video overflow-hidden m-0 ">
+            {# Maybe on future we'll have image support. Feels like an important feature to have. #}
+            <img src="https://via.placeholder.com/1600x900" alt="..." class="w-full h-full object-cover">
+        </figure>
 
-    <figure class="aspect-video overflow-hidden m-0 md:col-span-2">
-        {# Maybe on future we'll have image support. Feels like an important feature to have. #}
-        <img src="https://via.placeholder.com/1600x900" alt="..." class="w-full h-full object-cover">
-    </figure>
+        <div class="md:col-span-2 text-left">
+            <div class="py-4">
+                <h2 class="text-2xl">{{ _("Description") }}</h2>
+                <p>{{item.description}}</p>
+            </div>
+            <hr />
+            <div class="flex justify-between gap-2 py-2">
+                <p class="card-text"><small class="text-muted">{{ _("Last updated 3 mins ago") }}</small></p>
+                <div class="flex gap-2">
+                    <p class="text-sm">Share:</p>
+                    <a href="https://www.facebook.com/sharer.php?u={{ url_for('items.view', id=id, _external=True) | urlencode }}" target="_blank" title="Share on Facebook"><i class="fa-brands fa-facebook fa-lg"></i></a>
+                    <a href="https://twitter.com/intent/tweet?url={{ url_for('items.view', id=id, _external=True) | urlencode }}" target="_blank" title="Share on Twitter"><i class="fa-brands fa-twitter fa-lg"></i></a></script>
+                </div>
+            </div>
+            
+            {# Contact seller buttons #}
+            <div class="py-4">
+                <p class="text-xl block mb-4"><span class="font-bold">{{ _("Visit seller profile:") }}</span> <a href="{{ url_for('auth.profile', email=item.seller.email) }}">{{item.seller.email}}</a></p>
+                <a href="mailto:{{item.seller.email}}" class="btn btn-primary btn-sm"><i class="fa-regular fa-envelope"></i> {{ _("Contact seller") }}</a>
+                <a href="tel:{{item.seller.phone}}" class="btn btn-primary btn-sm"><i class="fa-solid fa-phone"></i> {{ _("Call seller") }}</a>
+            </div>
+        </div>
+    </div>
 
-    <div class="md:col-span-1 text-left bg-white p-4 rounded-[15px]">
+    <div class="h-fit md:col-span-1 text-left bg-white p-4 rounded-[15px]">
         <h2 class="text-2xl">{{ _("Place a bid") }}</h2>
         {% if item.is_open %}
         <div class="flex flex-col">
             <p><span class="font-bold">{{ _("Closes at") }}</span> <time datetime="{{ item.closes_at.isoformat() }}">{{ item.closes_at.strftime("%d.%m.%y %H:%M") }}</time></p>
             <p><span class="font-bold">{{ _("Added at") }}</span> <time datetime="{{ item.created_at.isoformat() }}">{{ item.created_at.strftime("%d.%m.%y %H:%M") }}</time></p>
-            <p class="font-bold text-xl inline-block my-4"><span>{{ _("Starting bid") }}</span> {{ item.starting_bid|localcurrency }};</p>
+            {% if not bid_history %}
+            <p class="font-bold text-xl inline-block my-4"><span>{{ _("Starting bid") }}</span> {{ item.starting_bid|localcurrency }}</p>
+            {% endif %}
             {% if winning_bid is not none %}
-            <p class="font-bold text-xl inline-block my-4"><span>{{ _("Highest bid") }}</span> {{ winning_bid.amount|localcurrency }};</p>
+            <p class="font-bold text-xl inline-block my-4"><span>{{ _("Highest bid") }}</span> {{ winning_bid.amount|localcurrency }}</p>
             {% endif %}
             <form class="w-fit pb-4" action="{{ url_for('items.bid', id=item.id)}}" method="post">
                 <div class="form-group row">
@@ -31,47 +57,30 @@
                     <div class="flex flex-col">
                         <label class="sr-only" for="bid">{{ _("Bid amount") }}</label>
                         <div>
-                            <input type="number" name="amount" class="" id="bid" placeholder="Bid amount" min="{{ min_bid }}" required>
+                            <input type="number" name="amount" class="" id="bid" placeholder="Bid amount" required>
                         </div>
                         <small class="form-text text-muted">
-                            {{ _("Minimum bid is") }} {{ min_bid|localcurrency }};
+                            {{ _("Minimum bid is") }} {{ min_bid|localcurrency }}
                         </small>
                     </div>
                     <button type="submit" class="btn btn-secondary mt-4">{{ _("Bid") }}</button>
                 </div>
             </form>
-            <h3 class="text-xl mt-4">{{ _("Bid history") }}</h3>
-            <ul>
-                {% if bid_history is not none %}
-                    {%for bid in bid_history %}
-                        {% if not loop.first %}
-                            <li>{{ bid.amount|localcurrency}} at {{ bid.created_at.strftime("%d.%m.%y %H:%M:%S") }}</li>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-            </ul>
+
+            {% if bid_history %}
+                <h3 class="text-xl mt-4">{{ _("Bid history") }}</h3>
+                <ul>
+                {% for bid in bid_history %}
+                    <li>{{ bid.amount|localcurrency }} at {{ bid.created_at.strftime("%d.%m.%y %H:%M:%S") }}</li>
+                {% endfor %}
+                <li>{{ _("Starting bid") }} {{ item.starting_bid|localcurrency }}.</li>
+                </ul>
+            {% endif %}
         </div>
 
         {% else %}
-        <div class="alert alert-info">
-            <strong>{{ _("Item is no longer at sale.") }}</strong> {{ _("Next time, act faster!") }}
-        </div>
+            <p><strong class="text-red">{{ _("Item is no longer at sale.") }}</strong> {{ _("Next time, act faster!") }}</p>
         {% endif %}
-    </div>
-
-    <div class="md:col-span-2 text-left">
-        <div class="py-4">
-            <h2 class="text-2xl">{{ _("Description") }}</h2>
-            <p>{{item.description}}</p>
-        </div>
-        <hr />
-        <p class="card-text"><small class="text-muted">{{ _("Last updated 3 mins ago") }}</small></p>
-        {# Contact seller buttons #}
-        <div class="py-4">
-            <p class="text-xl block mb-4"><span class="font-bold">{{ _("Visit seller profile:") }}</span> <a href="{{ url_for('auth.profile', email=item.seller.email) }}">{{item.seller.email}}</a></p>
-            <a href="mailto:{{item.seller.email}}" class="btn btn-primary btn-sm"><i class="fa-regular fa-envelope"></i> {{ _("Contact seller") }}</a>
-            <a href="tel:{{item.seller.phone}}" class="btn btn-primary btn-sm"><i class="fa-solid fa-phone"></i> {{ _("Call seller") }}</a>
-        </div>
     </div>
 </div>
 

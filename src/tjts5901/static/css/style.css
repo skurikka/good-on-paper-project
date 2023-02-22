@@ -4,9 +4,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&display=swap');
 
-@import "navigation.css";
-@import "form.css";
-
 .container {
     @apply mx-auto w-full;
 }
@@ -51,6 +48,18 @@ a:hover {
 .btn:hover {
     @apply text-primary-700 cursor-pointer;
     background-color: transparent;
+}
+
+.btn-language {
+    @apply text-primary-700 my-1.5 font-bold no-underline text-lg w-fit;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.btn-language:hover {
+    @apply text-primary-700 cursor-pointer underline;
+    background-color: transparent;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
 }
 
 .btn-primary {
@@ -170,15 +179,15 @@ figure > img {
 /* NAVIGATION */
 
 nav {
-    @apply flex flex-col gap-4 md:gap-0 sm:flex-row sm:justify-between sm:items-center items-center py-2 text-lg;
+    @apply flex flex-col gap-4 md:gap-0 md:flex-row md:justify-between md:items-center items-center py-2 text-lg flex-wrap;
 }
 
 #main-navigation ul {
-    display: flex;
     flex-direction: row;
     list-style-type: none;
     gap: 1.5em;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 #main-navigation a {
@@ -218,7 +227,7 @@ footer {
 
 /* FORMS*/
 
-#register, #login {
+#register, #login, #token-form {
     width: fit-content;
     justify-self: center;
     max-width: 300px;

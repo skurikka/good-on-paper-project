@@ -143,7 +143,6 @@ def format_converted_currency(value, currency=None, **kwargs):
                            local_amount=format_currency(local_value, currency=currency, **kwargs))
     return Markup(html)
 
-
 def convert_currency(value, currency=None, from_currency=REF_CURRENCY):
     """
     Convert a currency value to the preferred currency.

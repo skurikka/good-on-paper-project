@@ -30,10 +30,10 @@
           <img src="https://via.placeholder.com/400x300" class="w-full h-full object-cover" alt="...">
         </figure>
         <div class="p-4">
-          <h5 class=""><a href="{{ url_for('items.view', id=item.id)}}">{{ item.title }}</a></h5>
-          <p class=""><span>{{ _("Starting bid:") }}</span> {{ item.starting_bid|localcurrency }}</p>
-          <p class=""><span>{{ _("Closes at:") }}</span> {{ item.closes_at.strftime("%d.%m.%y %H:%M") }}</p>
-          <p class=""><span>{{ _("Seller:") }}</span> {{ item.seller.email }}</p>
+          <h5><a href="{{ url_for('items.view', id=item.id)}}">{{ item.title }}</a></h5>
+          <p><span>{{ _("Starting bid:") }}</span> {{ item.starting_bid|localcurrency }}</p>
+          <p><span>{{ _("Closes at:") }}</span> {{ item.closes_at.strftime("%d.%m.%y %H:%M") }}</p>
+          <p><span>{{ _("Seller:") }}</span> {{ item.seller.email }}</p>
       </li>
       {% endfor %}
     </ul>
