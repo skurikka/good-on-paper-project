@@ -85,6 +85,8 @@ Added basic functionality for mongodb
 
 ### Week 3
 
+Helped Linda and Ville for configuring mongo, and login functionalities. Did some research on OWASP considerations and how to implement those in our program 
+
 ### Week 4
 Finished setting up logging. Opened account at sentry.io and listed our project there
 
