@@ -1,4 +1,5 @@
 import logging
+import re
 
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -154,7 +155,6 @@ def register():
             error = 'Password is required.'
         elif password != password2:
             error = 'Passwords do not match.'
-            """
         elif len(password) < 7 :
             error = 'Password must be atleast 7 characters long'
         elif len(password) > 30 :
@@ -167,7 +167,6 @@ def register():
             error = 'Password must contain one number'
         elif not any(map(lambda x: x in password, special_characters)):
             error = 'Password must contain atleast one special character: ' + special_characters
-        """
         elif not terms:
             error = 'You must agree to the terms.'
      

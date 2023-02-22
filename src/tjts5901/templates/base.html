@@ -16,7 +16,7 @@
                     <a href="{{ url_for('items.index') }}">
                         <img src="{{ url_for('static', filename='images/logoipsum-221.svg') }}">
                     </a>
-                    <button class="inline-block md:hidden btn-language uppercase" onclick="language_mob();">Language <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="inline-block md:hidden btn-language uppercase" onclick="language_mob();">{{ _("Language") }}<i class="fa-solid fa-caret-down"></i></button>
                     <ul id="lang-mobile" class="hidden bg-white border-2 border-primary-700 p-4 rounded-[15px] absolute top-8 right-0">
                         {% for _, lang in locales.items() %}
                             <li><a class="{% if lang|lower == get_locale()|lower %}active{% endif %}" href="{{ url_for(request.endpoint, **dict(request.view_args, locale=lang)) }}">{{lang.display_name}}</a></li>
@@ -24,7 +24,7 @@
                     </ul>
                 </div>
                 <div class="flex flex-col w-fit relative items-end z-10">
-                    <button class="hidden md:inline-block btn-language uppercase" onclick="language();">Language <i class="fa-solid fa-caret-down"></i></button>
+                    <button class="hidden md:inline-block btn-language uppercase" onclick="language();">{{ _("Language") }} <i class="fa-solid fa-caret-down"></i></button>
                     <ul id="lang-desktop" class="hidden bg-white border-2 border-primary-700 p-4 rounded-[15px] absolute top-8 right-0">
                         {% for _, lang in locales.items() %}
                             <li><a class="{% if lang|lower == get_locale()|lower %}active{% endif %}" href="{{ url_for(request.endpoint, **dict(request.view_args, locale=lang)) }}">{{lang.display_name}}</a></li>
