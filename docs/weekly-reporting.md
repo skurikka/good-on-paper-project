@@ -32,6 +32,7 @@ Started working on the final project and presentation
 
 ### Week 5
 
+Finalizing the program and made the final report and presentation materials. 
 
 ## Ville
 
