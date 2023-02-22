@@ -21,10 +21,6 @@ body {
     letter-spacing: 0.1em;
 }
 
-main {
-    padding-top: 78px;
-}
-
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
 }
@@ -144,6 +140,17 @@ figure > img {
     border-style: solid;
 }
 
+.flash-note {
+    @apply bg-white border-dark-gray;
+    width: fit-content;
+    justify-self: center;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-style: solid;
+}
+
+
 .flash-error span, .flash-success span {
     color: black;
     padding: 0.5em 1em 0.5em 1em;
@@ -205,7 +212,6 @@ nav {
 .header-section {
     background-color: white;
     filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
-    position: fixed;
     width: 100%;
     top: 0;
 }

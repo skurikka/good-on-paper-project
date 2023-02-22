@@ -1,32 +1,65 @@
-function terms(){
-	alert('Nobody reads these...');
+/**
+ * Display message
+ */
+
+function showMessage(message, category="message", created_at=Date.now()) {
+    // Insert new toast
+    const html = document.querySelector("#messages").content.cloneNode(true);
+    html.classList += " " + category;
+    html.querySelector(".message").innerHTML = message;
+    html.querySelector("time.created-at").setAttribute("datetime", created_at);
+    ago = moment(created_at).fromNow();
+    html.querySelector("time.created-at").append(ago);
+    document.querySelector("#messages").append(html);
+
+    // Get the last inserted toast - the one we just appended
+    // and show it with bootsrap api
+    const messages = document.querySelectorAll("#messages");
+    const element = messages[messages.length-1];
+
+    let toast_options = {
+        'delay': 10000,
+        'autohide': false,
+    };
+    // Handle toast differenlty depending on category
+    switch(category) {
+        case "error":
+            element.classList += " bg-danger text-white"
+            toast_options['autohide'] = false;
+            break;
+        case "success":
+            element.classList += " bg-success text-white"
+            toast_options['autohide'] = true;
+        default:
+            break;
+    }
+
+    const toast = new bootstrap.Toast(element, toast_options);
+    toast.show();
 }
 
-function copyToken() {
-	var copyText = document.getElementById("token");
-	copyText.select();
-	copyText.setSelectionRange(0, 99999);
-	document.execCommand("copy");
-}
+/**
+ * When page is loaded, display notifications.
+ */
+ window.addEventListener('load', function() {
+    // Populate notifications from the page first
+    let delay = 0;
+    notifications.forEach(msg => {
+        // Use delay as timeout to make them appear neatly.
+        setTimeout(() => showMessage(msg.message, msg.category, msg.created_at), delay += 150);
+    });
 
-function language(){
-	var lang = document.getElementById("lang-desktop");
-	if (lang.classList.contains("hidden")) {
-		lang.classList.add("block");
-		lang.classList.remove("hidden");
-	} else {
-		lang.classList.add("hidden");
-		lang.classList.remove("block");
-	}
-}
+    // Start timed loop to fetch new notifications from backend
+    setInterval(() => {
+        delay = 0;
+        // Fetch notifications from backend
+        fetch(NOTIFICATION_URL)
+            .then(response => response.json())
+            .then(data => {
+                data['notifications'].forEach(msg => {
+                    setTimeout(() => showMessage(msg.message, msg.category, msg.created_at), delay += 150);
+                });
+            });
+    }, NOTIFICATION_WAIT_TIME);
 
-function language_mob(){
-	var lang = document.getElementById("lang-mobile");
-	if (lang.classList.contains("hidden")) {
-		lang.classList.add("block");
-		lang.classList.remove("hidden");
-	} else {
-		lang.classList.add("hidden");
-		lang.classList.remove("block");
-	}
-}
+})

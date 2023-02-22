@@ -545,6 +545,10 @@ video {
   position: static;
 }
 
+.fixed {
+  position: fixed;
+}
+
 .absolute {
   position: absolute;
 }
@@ -585,6 +589,10 @@ video {
   margin: 0px;
 }
 
+.m-5 {
+  margin: 1.25rem;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -593,6 +601,10 @@ video {
 .my-4 {
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
 }
 
 .mb-4 {
@@ -605,6 +617,10 @@ video {
 
 .mb-8 {
   margin-bottom: 2rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
 }
 
 .mr-auto {
@@ -722,6 +738,11 @@ video {
   border-radius: 15px;
 }
 
+.rounded-t-\[8px\] {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
 .border-2 {
   border-width: 2px;
 }
@@ -729,6 +750,11 @@ video {
 .border-primary-700 {
   --tw-border-opacity: 1;
   border-color: rgb(22 39 31 / var(--tw-border-opacity));
+}
+
+.bg-gray {
+  --tw-bg-opacity: 1;
+  background-color: rgb(211 211 211 / var(--tw-bg-opacity));
 }
 
 .bg-white {
@@ -868,10 +894,6 @@ body {
   font-family: 'Roboto Mono', monospace;
   margin: 0;
   letter-spacing: 0.1em;
-}
-
-main {
-  padding-top: 78px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -1056,6 +1078,20 @@ figure > img {
   border-style: solid;
 }
 
+.flash-note {
+  --tw-border-opacity: 1;
+  border-color: rgb(169 169 169 / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+  width: -moz-fit-content;
+  width: fit-content;
+  justify-self: center;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  border-width: 2px;
+  border-style: solid;
+}
+
 .flash-error span, .flash-success span {
   color: black;
   padding: 0.5em 1em 0.5em 1em;
@@ -1130,7 +1166,6 @@ nav {
 .header-section {
   background-color: white;
   filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
-  position: fixed;
   width: 100%;
   top: 0;
 }

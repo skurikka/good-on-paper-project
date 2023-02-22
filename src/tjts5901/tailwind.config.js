@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./templates/**/*.html",
+    "./templates/base.html",
     "./static/**/*.js"
   ],
   theme: {
@@ -23,7 +24,9 @@ module.exports = {
       },
       'red' : '#D1462F',
       'white' : '#fff',
-      'black' : '#000'
+      'black' : '#000',
+      'gray' : '#d3d3d3',
+      'dark-gray' : '#a9a9a9'
     },
     screens: {
       'sm': '640px',

@@ -13,6 +13,7 @@ pyIsEmail
 email-validator
 Flask-Babel
 CurrencyConverter
+Flask-APScheduler
 
 # Git hooks
 pre-commit

@@ -56,12 +56,20 @@ def create_app(config: Optional[Dict] = None) -> Flask:
     # Init db connection
     init_db(flask_app)
     
+     # Initialize the scheduler.
+    from .scheduler import init_scheduler  # pylint: disable=import-outside-toplevel
+    init_scheduler(flask_app)
+
+    
     @flask_app.route('/debug-sentry')
     def trigger_error():
         division_by_zero = 1 / 0
 
     from .auth import init_auth
     init_auth(flask_app)
+
+    from .notification import init_notification
+    init_notification(flask_app)
 
     from .currency import init_currency
     init_currency(flask_app)
