@@ -36,17 +36,26 @@ Finalizing the program and made the final report and presentation materials.
 
 ## Ville
 
-##WEEK 1:
+### WEEK 1:
+
 Helped with the stakeholder analysis, environment setup etc
-##Week 2:
+
+### Week 2:
+
 Fixed Gitlab runners picking wrong branches, fixed MongoDb config to use correct database. Setup mongodb to work in actual production (Azure side stuff)
-##WEEK 3:
+
+### WEEK 3:
+
 Helped with password security (hashing and salting), changed gitlab runners to pick correct tags, so developement branch wasn't the production version
-##WEEK 4:
+
+### WEEK 4:
+
 - Added password checks
 - Added min and max age requirements
 - Added ability to store, update and delete items to/from backend, some css fixes
-##WEEK 5:
+
+### WEEK 5:
+
 - Fixed bidding error if there is no bidding history
 - Fixed crash on empty bid value, added required tags for important fields
 - Added email validation
@@ -82,7 +91,13 @@ Started to set up logging and monitoring.
 
 ### Week 4
 
+Added Tailwindcss and fixed html and css to be more responsive. Also added user profile page, item page and and functionality to bid items.
+
 ### Week 5
+
+Added REST api functionality and page for tokens. Fixed more html and css and added content to footer. Implemented functionality to share items on social media and added more translations.
+
+Also started to change flashing to messages, but did not finish in time so it is not implemented in final app.
 
 ## Ari
 
