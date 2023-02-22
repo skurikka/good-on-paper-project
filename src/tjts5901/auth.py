@@ -275,7 +275,7 @@ def profile(email):
     user: User = User.objects.get_or_404(email=email)
 
     # List the items user has created
-    items = Item.objects(seller=user).order_by('-created_at') .all()
+    items = Item.objects(seller=user).all()
 
     return render_template('auth/profile.html', user=user, items=items)
 
