@@ -36,15 +36,29 @@ Finalizing the program and made the final report and presentation materials.
 
 ## Ville
 
-### Week 1
-
-### Week 2
-
-### Week 3
-
-### Week 4
-
-### Week 5
+##WEEK 1:
+Helped with the stakeholder analysis, environment setup etc
+##Week 2:
+Fixed Gitlab runners picking wrong branches, fixed MongoDb config to use correct database. Setup mongodb to work in actual production (Azure side stuff)
+##WEEK 3:
+Helped with password security (hashing and salting), changed gitlab runners to pick correct tags, so developement branch wasn't the production version
+##WEEK 4:
+- Added password checks
+- Added min and max age requirements
+- Added ability to store, update and delete items to/from backend, some css fixes
+##WEEK 5:
+- Fixed bidding error if there is no bidding history
+- Fixed crash on empty bid value, added required tags for important fields
+- Added email validation
+- Fixed tailwind support
+- Added testing, coverage, static security testing, fixed staging not working -> made pipeline work correctly
+- Made sentry logging to work in production
+- Added terms and agreements popup
+- Added min and max length requirements to some fields. Fixed login crash, set user to None by default
+- Made mongodb to use its test database when running tests
+- Disable debug mode when running tests
+- Added pem for git ignore
+- Enabled password checks and made some final minute translations
 
 ## Linda
 
