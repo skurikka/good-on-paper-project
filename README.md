@@ -28,7 +28,3 @@ Please see the `docs/tjts5901` folder for more complete documentation.
 ## To report a bug/security issue
 
 Please, [fill our form](https://gitlab.jyu.fi/good-on-paper/good-paper-project/-/issues/new) to report any issues.
-
-## App
-
-https://goodonpaper-app.azurewebsites.net/
